@@ -1,19 +1,24 @@
+//Ángel 22/05/2020-14:57
+
 /**************************************************************************************/
 //DEFINIENDO CLASES
 const comandos = ["ldr", "mov", "str", "add", "sub", "mul", "and", "not", "xor", "Neg"];
 const errores = {
-	comandoDesconocido: {
+	comando: {
 		1: "El comando que ingresó es desconocido"
 	},
-	espacioDenegado: {
+	espacio: {
 		1: "Está tratando un espacio de memoria innaccesible",
 		2: "Error de almacenamiento",
 		3: "Error de carga",
 		4: "El dato inmediato es inválido"
 	},
-	muchosRegistros: {
+	registro: {
 		1: "Muchos registros para esa instrucción",
 		2: "Dicha instrucción requiere de más registros"
+	},
+	sintaxis: {
+		1: "Mala sintaxis al momento de usar los registros"
 	}
 };
 
@@ -88,6 +93,94 @@ function inicializar_RAM() {
 
 } inicializar_RAM();
 console.log(RAM)
+
+//Es la primera función que se ejecuta al momento de dar clic el botón Ejecutar de index.html
+function ejecutar(){
+	let j = 0;
+	var contadorLineas = 0;
+	var textoArr = [];
+	var texto = document.getElementById('area-de-codigo');
+	console.log(texto.value);
+	textoArr = texto.value.split('\n'); //guarda en el arreglo textoArr todas las palabras separadas por un salto de línea
+	for(let i = 0; i < textoArr.length; i++){		/** recorre el arreglo para encontrar espacios en blanco y borrarlos*/
+		if(textoArr[i] == ""){
+			borrarElemento(textoArr, textoArr[i]); //Borra todos los espacios en blanco del arreglo
+		}
+	}
+
+	while(j < textoArr.length){ //con los espacios en blanco borrados, va recorriendo línea por línea para analizar el código
+		if(analizar(textoArr[j]) == true){ //función que analizar cada elemento del arreglo
+			j ++; //Si todo está bien, se pasa a la siguiente línea
+		}else{
+			//Instrucciones que van a analizar el tipo de error
+		}
+	}
+	console.log(textoArr);
+}
+
+function analizar(instruccion){
+	let i = 0;
+	var bien = false;
+	let arrParaAnalizarLaInstruccion = [];
+	let arrParaAnalizarLosRegistros = [];
+	var nuevoStr = [];
+	arrParaAnalizarLaInstruccion = instruccion.split(' '); //Separo cada instrucción en espacios y guardo cada elemento en un arreglo
+	while(i < comandos.length){
+		if(arrParaAnalizarLaInstruccion[0] == comandos[i]){ //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
+			bien = true;
+			for(let j = 4; j < instruccion.length; j++){
+				nuevoStr.push(instruccion.charAt(j));
+			}
+			break;
+		}else{
+			i++;
+		}
+	}
+	if(bien == true){
+		if(contarCaracter(nuevoStr, ',') == 1){
+			console.log("bien");
+		}else{
+			console.log(errores["sintaxis"][1]);
+		}
+	}else{
+		console.log(errores["comando"][1]);
+	}
+	console.log(nuevoStr);
+	return bien;
+
+}
+
+function instruccionDeUnRegistro(ins, reg){
+
+}
+
+function instruccionDeDosRegistros(ins, reg1, reg2){
+
+}
+
+function instruccionDeTresRegistros(ins, reg1, reg2, reg3){
+
+}
+
+
+function borrarElemento(arr, elemento){ //función que borra un elemento de un arreglo, 
+	var j = arr.indexOf(elemento);		//recibe el arrelgo y el elemento que se quiere borrar, respectivamente
+	arr.splice(j, 1);
+
+	return arr;								
+}
+
+function contarCaracter(arr, char){ //cuenta cuantas veces se repite un caracter en un arreglo,
+	let caracter = 0;						//recibe el arreglo y el caracter a contar
+	for(let i = 0; i < arr.length; i++){
+		if(arr[i] == char){
+			caracter++;
+		}
+	}
+
+	console.log(`El caracter ${char} en la cadena se repite ${caracter} veces`);
+	return caracter;
+}
 
 
 var cont = 0;

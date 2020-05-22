@@ -8,9 +8,9 @@
 </head>
 
 <body style="background-color: black; color: white">
-	<div class="container-fluid" style="height: 100vh">
+	<div class="container-fluid cien-vh">
 		<div class="row">
-			<div class="col-4 px-10" style="padding-left: 50px;padding-top: 30px">
+			<div id="aplicar-scroll" class="col-3 px-10 padding-l-50" style="padding-top: 30px;">
 				<h4 style="color: #02D358">Registros & Flags</h4>
 				<table style="font-size: 15px">
 					<tr>
@@ -20,9 +20,15 @@
 					<tbody id="registros"></tbody>
 				</table>
 			</div>
+			<div class="col-5" style="padding-top: 50px;">
+				<textarea class="cien" name="area-de-codigo" id="area-de-codigo"></textarea>
+			</div>
+			<div class="col-2">
+				<button style="margin-top: 50px;" onclick="ejecutar()">Ejecutar</button>
+			</div>
 		</div>
 		<div class="row">
-			<div id="aplicar-scroll" class="col-7" style="padding-left: 50px; padding-top: 20px">
+			<div id="aplicar-scroll" class="col-7 padding-l-50" style="padding-top: 20px">
 				<h4 style="color: #02D358">Memoria</h4>
 				<table style="border: 0.2px solid white; border-collapse: collapse;">
 					<tr style="border: 0.2px solid white">

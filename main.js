@@ -22,10 +22,6 @@ class Registro {
 		this.nombre = nombre;
 		this.contenido = contenido;
 	}
-
-	getRegistro(){
-		return this.nombre;
-	}
 }
 
 

@@ -2,3 +2,16 @@
     overflow-y: auto;
     overflow-x: auto;
 }
+
+.cien{
+    height: 100%!important;
+    width: 100%!important;
+}
+
+.cien-vh{
+    height: 100vh;
+}
+
+.padding-l-50{
+    padding-left: 50px;
+}

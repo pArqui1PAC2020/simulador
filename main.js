@@ -269,12 +269,13 @@ function unirRegistros(arregloDesordenado){
 function instruccionDeDosElementos(ins, operando1, operando2, arr){
 	//ANA arreglo = ["com", "rX", "rY"], ["com", "rX", "#Y"]
 	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1} y ${operando2}; el arreglo actual es ${arr}`);
-
+	evaluarComando(arr);
 }
 
 function instruccionDeTresElementos(ins, operando1, operando2, operando3, arr){
 	//GERARDO ["com", "rX", "rY", "rZ"]
 	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1}, ${operando2} y ${operando3}; el arreglo actual es ${arr}`);
+	evaluarComando(arr);
 }
 
 

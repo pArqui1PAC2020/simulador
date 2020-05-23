@@ -2,7 +2,7 @@
 
 /**************************************************************************************/
 //DEFINIENDO CLASES
-const comandos = ["ldr", "mov", "str", "add", "sub", "mul", "and", "not", "xor", "Neg"];
+const comandos = ["ldr", "str", "mov", "add", "sub", "mul", "and", "mvn", "eor", "orr", "Neg"];
 const errores = {
 	comando: {
 		1: "El comando que ingresó es desconocido"
@@ -94,9 +94,28 @@ function inicializar_RAM() {
 } inicializar_RAM();
 console.log(RAM)
 
+//a = ["mov r0, r1", "mov r1, r2", "stop: wfi"]
+//a = [["mov", "r0", "r1"], ]
+
+// arregloROM = [
+// 	{
+// 		direccion: "dirección de memoria ROM 00",
+// 		instruccion: "instruccion"
+// 	},
+// 	{
+// 		direccion: "dirección de memoria ROM 02",
+// 		instruccion: "instruccion"
+// 	}
+// ]
+
+ROM = [];
+
+
 //Es la primera función que se ejecuta al momento de dar clic el botón Ejecutar de index.html
 function ejecutar(){
-	let j = 0;
+	inicializar_registros();
+	inicializar_RAM();
+	let j = 0; //Línea actual
 	var contadorLineas = 0;
 	var textoArr = [];
 	var texto = document.getElementById('area-de-codigo');
@@ -118,13 +137,13 @@ function ejecutar(){
 	console.log(textoArr);
 }
 
-function analizar(instruccion){
+function analizar(instruccion){ //instrucción = "mov r0, r1"
 	let i = 0;
 	var bien = false;
 	let arrParaAnalizarLaInstruccion = [];
 	let arrParaAnalizarLosRegistros = [];
-	var nuevoStr = [];
-	arrParaAnalizarLaInstruccion = instruccion.split(' '); //Separo cada instrucción en espacios y guardo cada elemento en un arreglo
+	var nuevoStr = []; //["r", "0", ",", "", "r", "1"]
+	arrParaAnalizarLaInstruccion = instruccion.split(' '); //["mov", "r0,", "r1"] Separo cada instrucción en espacios y guardo cada elemento en un arreglo
 	while(i < comandos.length){
 		if(arrParaAnalizarLaInstruccion[0] == comandos[i]){ //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
 			bien = true;
@@ -136,9 +155,10 @@ function analizar(instruccion){
 			i++;
 		}
 	}
+
 	if(bien == true){
 		if(contarCaracter(nuevoStr, ',') == 1){
-			console.log("bien");
+			console.log("bien"); //Agregar filtro para localizar posición de la coma
 		}else{
 			console.log(errores["sintaxis"][1]);
 		}
@@ -150,24 +170,120 @@ function analizar(instruccion){
 
 }
 
-function instruccionDeUnRegistro(ins, reg){
+function instruccionDeDosElemnentos(ins, operando1, operando2, arr){
+	//ANA arreglo = ["com", "rX", "rY"], ["com", "rX", "#Y"]
+	evaluarComando();
 
 }
 
-function instruccionDeDosRegistros(ins, reg1, reg2){
-
+function instruccionDeTresElementos(ins, operando1, operando2, operando3){
+	//GERARDO ["com", "rX", "rY", "rZ"]
 }
 
-function instruccionDeTresRegistros(ins, reg1, reg2, reg3){
-
+function instruccionDeDosRegistrosYUnDatoInmediato(ins, operando1, operando2, datoInmediato){
+	//JONATHAN ["com", "rX", "rY", "#Z"]
 }
 
+function instruccionDeUnRegistroYUnDatoInmediato(ins, operando1, datoInmediato){
+	//GABRIELA	["com", "rX", "#Y"]
+}
 
-function borrarElemento(arr, elemento){ //función que borra un elemento de un arreglo, 
-	var j = arr.indexOf(elemento);		//recibe el arrelgo y el elemento que se quiere borrar, respectivamente
-	arr.splice(j, 1);
+//INICIO DE FUNCIONAMIENTO DE COMANDOS
+
+
+//FIN DE FUNCIONAMIENTO DE COMANDOS
+
+function evaluarComando(arrComando){
+	switch(arrComando[0]){ //"ldr", "str", "mov", "add", "sub", "mul", "and", "not", "xor", "Neg"
+		case "ldr":
+			break;
+		case "str":
+			break;
+		case "mov":
+			if(arrComando.length == 3){
+				if(arrComando[2].charAt(0) == 'r'){
+					movCon2Registros(arrComando[1], arrComando[2]); //["mov", "rX", "rY"] //ANA
+				}else{
+					movCon1RegistroY1DatoInmediato(arrComando[1], arrComando[2]); //ANA
+				}
+			}
+			break;
+		case "add":
+			if(arrComando.length == 3){ //Si es una instrucción y 2 operandos 
+				if(arrComando[2].charAt(0) == 'r'){
+					addCon2Registros(arrComando[1], arrComando[2]); //add rX, rY //ANA
+				}else{
+					addCon1RegistroY1DatoInmediato(arrComando[1], arrComando[2]); //add rX, #Y //ÁNGEL copia
+				}
+			}else{ //Una instrucción, 2 registros y 1 dato inmediato
+				if(arrComando[3].charAt(0) == 'r'){ //add rX, rY, rZ (o add rX, rX, rY -- o add rX, rY, rY) //ÁNGEL copia
+					addCon3Registros(arrComando[1], arrComando[2], arrComando[3]);
+				}else{ //add rX, rY, #Z
+					addCon2RegistrosY1DatoInmediato(arrComando[1], arrComando[2], arrComando[3]); //ÁNGEL copia
+				}
+			}
+			break;
+		case "sub":
+			if(arrComando.length == 3){ //Si es una instrucción y 2 operandos 
+				if(arrComando[2].charAt(0) == 'r'){ //sub rX, rY
+					subCon2Registros(arrComando[1], arrComando[2]); //GABRIELA
+				}else{
+					subCon1RegistroY1DatoInmediato(arrComando[1], arrComando[2]); //sub rX, #Y //GABRIELA
+				}
+			}else{ //Una instrucción, 2 registros y 1 dato inmediato
+				if(arrComando[3].charAt(0) == 'r'){  //sub rX, rY, rZ (o sub rX, rX, rY) se evaluará en esta función       
+					subCon3Registros(arrComando[1], arrComando[2], arrComando[3]); //GABRIELA
+				}else{ //sub rX, rY, #Z (o sub rX, rX, #Y)
+					subCon2RegistrosY1DatoInmediato(arrComando[1], arrComando[2], arrComando[3]); //GERARDO
+				}
+			}
+			break;
+		case "mul": //mul rX, rY -- mul rX, rY, rX -- mul rX, rX, rY
+			if(arrComandos.length == 3){ //mul rX, rY
+				mulCon2Registros(arrComando[1], arrComando[2]); //GERARDO //En esta función (OJO)-->*TAMBIÉN*<--(OJO) se evaluarán errores	
+			}else{
+				mulCon3Registros(arrComando[1], arrComando[2], arrComando[3]); //GERARDO
+			}
+			break;
+		case "and":
+			and(arrComando[1], arrComando[2]); //JONATHAN
+		break;
+		case "mvn": //not
+			not(arrComando[1], arrComando[2]); //JONATHAN
+			break;
+		case "eor": //xor
+			eor(arrComando[1], arrComando[2]); //JONATHAN
+		break;
+		case "orr":
+			orr(arrComando[1], arrComando[2]); //WALTER
+			break;
+		case "Neg":
+			neg(arrComando[1], arrComando[2]); //WALTER
+			break;
+	}
+}
+
+function borrarElemento(arr, elemento){//función que borra un elemento de un arreglo, 
+	var j = arr.indexOf(elemento);
+	if(j != -1){  						//recibe el arreglo y el elemento que se quiere borrar, respectivamente
+		arr.splice(j, 1);
+	}else{
+		arr = null;
+	}
 
 	return arr;								
+}
+
+function aBinario(num){
+	return num.toString(2);
+}
+
+function aHexadecimal(num){
+	return num.toString(16);
+}
+
+function aDecimal(num){
+	return num.toString(10);
 }
 
 function contarCaracter(arr, char){ //cuenta cuantas veces se repite un caracter en un arreglo,

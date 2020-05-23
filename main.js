@@ -19,6 +19,9 @@ const errores = {
 	},
 	sintaxis: {
 		1: "Mala sintaxis al momento de usar los registros"
+	},
+	desconocido: {
+		1: "Error desconocido"
 	}
 };
 
@@ -110,34 +113,48 @@ console.log(RAM)
 
 ROM = [];
 
+var contadorLineas = 0;
 
 //Es la primera función que se ejecuta al momento de dar clic el botón Ejecutar de index.html
 function ejecutar(){
+	// document.getElementById('area-de-codigo').value = null;
 	inicializar_registros();
 	inicializar_RAM();
+	let estado;
 	let j = 0; //Línea actual
-	var contadorLineas = 0;
 	var textoArr = [];
 	var texto = document.getElementById('area-de-codigo');
 	console.log(texto.value);
-	textoArr = texto.value.split('\n'); //guarda en el arreglo textoArr todas las palabras separadas por un salto de línea
+	if(contarCaracterCadena(texto.value, '\n') == 0){
+		textoArr.push(texto.value);
+	}else{
+		textoArr = texto.value.split('\n'); 
+	}											//guarda en el arreglo textoArr todas las palabras separadas por un salto de línea
+	console.log(textoArr);
 	for(let i = 0; i < textoArr.length; i++){		/** recorre el arreglo para encontrar espacios en blanco y borrarlos*/
 		if(textoArr[i] == ""){
-			borrarElemento(textoArr, textoArr[i]); //Borra todos los espacios en blanco del arreglo
-		}
-	}
-
-	while(j < textoArr.length){ //con los espacios en blanco borrados, va recorriendo línea por línea para analizar el código
-		if(analizar(textoArr[j]) == true){ //función que analizar cada elemento del arreglo
-			j ++; //Si todo está bien, se pasa a la siguiente línea
-		}else{
-			//Instrucciones que van a analizar el tipo de error
+			textoArr = borrarElemento(textoArr, textoArr[i]); //Borra todos los espacios en blanco del arreglo
 		}
 	}
 	console.log(textoArr);
+	while(contadorLineas < textoArr.length){
+		estado = existenciaDeInstruccion(textoArr[contadorLineas]); //con los espacios en blanco borrados, va recorriendo línea por línea para analizar el código
+		if(estado == true){ //función que analiza cada elemento del arreglo
+			contadorLineas++; //Si todo está bien, se pasa a la siguiente línea
+		}else if(estado == "s1"){
+			imprimirError(errores["sintaxis"][1]);
+			contadorLineas = textoArr.length;    
+		}else if(estado == "c1"){
+			imprimirError(errores["comando"][1]);
+			contadorLineas = textoArr.length;
+		}else{
+			imprimirError(errores["desconocido"][1]);
+			contadorLineas = textoArr.length;
+		}
+	}
 }
 
-function analizar(instruccion){ //instrucción = "mov r0, r1"
+function existenciaDeInstruccion(instruccion){ //instrucción = "mov r0, r1"
 	let i = 0;
 	var bien = false;
 	let arrParaAnalizarLaInstruccion = [];
@@ -149,6 +166,7 @@ function analizar(instruccion){ //instrucción = "mov r0, r1"
 			bien = true;
 			for(let j = 4; j < instruccion.length; j++){
 				nuevoStr.push(instruccion.charAt(j));
+				nuevoStr = borrarElemento(nuevoStr, " ");
 			}
 			break;
 		}else{
@@ -158,35 +176,107 @@ function analizar(instruccion){ //instrucción = "mov r0, r1"
 
 	if(bien == true){
 		if(contarCaracter(nuevoStr, ',') == 1){
-			console.log("bien"); //Agregar filtro para localizar posición de la coma
+			console.log("bien"); 
+			existeUnaComa(nuevoStr, arrParaAnalizarLaInstruccion[0]);//Agregar filtro para localizar posición de la coma
+		}else if(contarCaracter(nuevoStr, ',') == 2){
+			console.log("bien"); 
+			existenDosComas(nuevoStr, arrParaAnalizarLaInstruccion[0]);//Agregar filtro para localizar posición de la coma
 		}else{
-			console.log(errores["sintaxis"][1]);
+			bien = "s1"; //errores["sintaxis"][1];
 		}
 	}else{
-		console.log(errores["comando"][1]);
+		bien = "c1";//errores["comando"][1]
 	}
 	console.log(nuevoStr);
+	console.log(bien);
 	return bien;
 
 }
 
-function instruccionDeDosElemnentos(ins, operando1, operando2, arr){
+function existeUnaComa(arregloDeUnaComa, ins){
+	let arregloFinal = [];
+	if(arregloDeUnaComa[2] == ','){
+		arregloFinal = borrarElemento(arregloDeUnaComa, ',');
+		instruccionCorrespondiente(ins, arregloFinal);
+	}else{
+		imprimirError(errores["sintaxis"][1]);
+	}
+	// console.log(arregloDeUnaComa);
+	console.log(arregloFinal);
+	return arregloFinal;
+}
+
+function existenDosComas(arregloDeDosComas, ins){
+	let arregloFinal = [];
+	if(arregloDeDosComas[2] == ',' && arregloDeDosComas[5] == ','){
+		arregloFinal = borrarElemento(arregloDeDosComas, ',');
+		instruccionCorrespondiente(ins, arregloFinal);
+	}else{
+		imprimirError(errores["sintaxis"][1]);
+	}
+	// console.log(arregloDeDosComas);
+	console.log(arregloFinal);
+	return arregloFinal;
+}
+
+function borrarElementoCadena(cadena, elemento){
+	return cadena.split(elemento).join('');
+}
+
+function imprimirError(error){
+	console.log("Error: " + error + " en la línea " + (contadorLineas + 1));
+}
+
+function instruccionCorrespondiente(instruccion, arreglo){
+	let nuevoArregloFinal = [];
+	let variable = unirRegistros(arreglo);
+	if(variable.length == 2){
+		nuevoArregloFinal.push(instruccion, variable[0], variable[1]);
+		instruccionDeDosElementos(instruccion, variable[0], variable[1], nuevoArregloFinal);
+	}else if(variable.length == 3){
+		nuevoArregloFinal.push(instruccion, variable[0], variable[1], variable[2]);
+		instruccionDeTresElementos(instruccion, variable[0], variable[1], variable[2], nuevoArregloFinal);
+	}else{
+		imprimirError(errores["desconocido"][1]);
+	}
+}
+
+function unirRegistros(arregloDesordenado){
+	console.log(arregloDesordenado);
+	let a = arregloDesordenado.join('-');
+	// console.log(a);
+	var cad1, cad2, cad3;
+	let arr = [];
+	if(a.length == 7){ //r-X-r-Y
+		cad1 = borrarElementoCadena(a.slice(0, 3), '-');
+		cad2 = borrarElementoCadena(a.slice(4), '-');
+		arr.push(cad1);
+		arr.push(cad2);
+	}else if(a.length == 11){ //r-X-r-Y-r-Z
+		cad1 = borrarElementoCadena(a.slice(0, 3), '-');
+		cad2 = 	borrarElementoCadena(a.slice(4, 7), '-');
+		cad3 = 	borrarElementoCadena(a.slice(8), '-');
+		arr.push(cad1);
+		arr.push(cad2);
+		arr.push(cad3);
+	}else{
+		imprimirError(errores["desconocido"][1]);
+	}
+	console.log(arr);
+	return arr;
+}
+
+function instruccionDeDosElementos(ins, operando1, operando2, arr){
 	//ANA arreglo = ["com", "rX", "rY"], ["com", "rX", "#Y"]
-	evaluarComando();
+	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1} y ${operando2}; el arreglo actual es ${arr}`);
 
 }
 
-function instruccionDeTresElementos(ins, operando1, operando2, operando3){
+function instruccionDeTresElementos(ins, operando1, operando2, operando3, arr){
 	//GERARDO ["com", "rX", "rY", "rZ"]
+	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1}, ${operando2} y ${operando3}; el arreglo actual es ${arr}`);
 }
 
-function instruccionDeDosRegistrosYUnDatoInmediato(ins, operando1, operando2, datoInmediato){
-	//JONATHAN ["com", "rX", "rY", "#Z"]
-}
-
-function instruccionDeUnRegistroYUnDatoInmediato(ins, operando1, datoInmediato){
-	//GABRIELA	["com", "rX", "#Y"]
-}
 
 //INICIO DE FUNCIONAMIENTO DE COMANDOS
 
@@ -264,14 +354,9 @@ function evaluarComando(arrComando){
 }
 
 function borrarElemento(arr, elemento){//función que borra un elemento de un arreglo, 
-	var j = arr.indexOf(elemento);
-	if(j != -1){  						//recibe el arreglo y el elemento que se quiere borrar, respectivamente
-		arr.splice(j, 1);
-	}else{
-		arr = null;
-	}
-
-	return arr;								
+	return arr.filter( function( e ) {
+		return e !== elemento;
+		 });						
 }
 
 function aBinario(num){
@@ -295,6 +380,17 @@ function contarCaracter(arr, char){ //cuenta cuantas veces se repite un caracter
 	}
 
 	console.log(`El caracter ${char} en la cadena se repite ${caracter} veces`);
+	return caracter;
+}
+
+function contarCaracterCadena(cad, char){
+	let caracter = 0;
+	for(let i = 0; i < cad.length; i++){
+		if(cad.charAt(i) == char){
+			caracter++;
+		}
+	}
+
 	return caracter;
 }
 

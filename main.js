@@ -182,10 +182,10 @@ function existenciaDeInstruccion(instruccion){ //instrucción = "mov r0, r1"
 	 while(i < comandos.length){
 		 if(arrParaAnalizarLaInstruccion[0] == comandos[i]){ //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
 			 bien = true;
-			 if(arrParaAnalizarLaInstruccion.length == 3 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[2], ',') < 1){ //["ins", "r0,", "r1"] || ["ins", "r0,", "#A..."]
+			 if(arrParaAnalizarLaInstruccion.length == 3 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], 'r') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], '#') < 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[2], ',') < 1){ //["ins", "r0,", "r1"] || ["ins", "r0,", "#A..."]
 				arrParaAnalizarLaInstruccion[1] = borrarElementoCadena(arrParaAnalizarLaInstruccion[1], ',');
 				bien2 = true;
-			 }else if(arrParaAnalizarLaInstruccion.length == 4 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[2], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[3], ',') < 1){ //["ins", "r...,", "r...,", "r..."]
+			 }else if(arrParaAnalizarLaInstruccion.length == 4 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], 'r') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], '#') < 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[2], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[3], ',') < 1){ //["ins", "r...,", "r...,", "r..."]
 				 arrParaAnalizarLaInstruccion[1] = borrarElementoCadena(arrParaAnalizarLaInstruccion[1], ',');
 				 arrParaAnalizarLaInstruccion[2] = borrarElementoCadena(arrParaAnalizarLaInstruccion[2], ',');
 				 bien2 = true;

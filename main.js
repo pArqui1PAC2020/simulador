@@ -114,15 +114,19 @@ console.log(RAM)
 ROM = [];
 
 var contadorLineas = 0;
-
+var contadorErrores = 0;
+var textoArr = [];
 //Es la primera función que se ejecuta al momento de dar clic el botón Ejecutar de index.html
 function ejecutar(){
 	// document.getElementById('area-de-codigo').value = null;
 	inicializar_registros();
 	inicializar_RAM();
+	contadorErrores = 0;
+	contadorLineas = 0;
+	textoArr.length = 0;
+	vaciarArreglos();
 	let estado;
 	let j = 0; //Línea actual
-	var textoArr = [];
 	var texto = document.getElementById('area-de-codigo');
 	console.log(texto.value);
 	if(contarCaracterCadena(texto.value, '\n') == 0){
@@ -137,10 +141,10 @@ function ejecutar(){
 		}
 	}
 	console.log(textoArr);
-	while(contadorLineas < textoArr.length){
+	// while(contadorLineas < textoArr.length){
 		estado = existenciaDeInstruccion(textoArr[contadorLineas]); //con los espacios en blanco borrados, va recorriendo línea por línea para analizar el código
 		if(estado == true){ //función que analiza cada elemento del arreglo
-			contadorLineas++; //Si todo está bien, se pasa a la siguiente línea
+			console.log("bien"); //Si todo está bien, se pasa a la siguiente línea
 		}else if(estado == "s1"){
 			imprimirError(errores["sintaxis"][1]);
 			contadorLineas = textoArr.length;    
@@ -151,15 +155,19 @@ function ejecutar(){
 			imprimirError(errores["desconocido"][1]);
 			contadorLineas = textoArr.length;
 		}
-	}
+	// }
 }
 
+function ejecutarSiguienteInstruccion(numLinea){
+	existenciaDeInstruccion(textoArr[numLinea]);
+}
+
+var arrParaAnalizarLaInstruccion = [];
+var nuevoStr = []; //["r", "0", ",", "", "r", "1"]
 function existenciaDeInstruccion(instruccion){ //instrucción = "mov r0, r1"
 	let i = 0;
 	var bien = false;
-	let arrParaAnalizarLaInstruccion = [];
 	let arrParaAnalizarLosRegistros = [];
-	var nuevoStr = []; //["r", "0", ",", "", "r", "1"]
 	arrParaAnalizarLaInstruccion = instruccion.split(' '); //["mov", "r0,", "r1"] Separo cada instrucción en espacios y guardo cada elemento en un arreglo
 	while(i < comandos.length){
 		if(arrParaAnalizarLaInstruccion[0] == comandos[i]){ //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
@@ -182,19 +190,23 @@ function existenciaDeInstruccion(instruccion){ //instrucción = "mov r0, r1"
 			console.log("bien"); 
 			existenDosComas(nuevoStr, arrParaAnalizarLaInstruccion[0]);//Agregar filtro para localizar posición de la coma
 		}else{
-			bien = "s1"; //errores["sintaxis"][1];
+			imprimirError(errores["sintaxis"][1]); //bien = "s1"; //errores["sintaxis"][1];
 		}
 	}else{
-		bien = "c1";//errores["comando"][1]
+		imprimirError(errores["comando"][1]); //bien = "c1";//errores["comando"][1]
 	}
 	console.log(nuevoStr);
 	console.log(bien);
 	return bien;
 
 }
+//rx,ry -- rx,#12,r3
+function rXrY(rx, ry){
+	//r1,r2
+}
 
+var arregloFinal = [];
 function existeUnaComa(arregloDeUnaComa, ins){
-	let arregloFinal = [];
 	if(arregloDeUnaComa[2] == ','){
 		arregloFinal = borrarElemento(arregloDeUnaComa, ',');
 		instruccionCorrespondiente(ins, arregloFinal);
@@ -206,17 +218,17 @@ function existeUnaComa(arregloDeUnaComa, ins){
 	return arregloFinal;
 }
 
+var arregloFinalDosComas = [];
 function existenDosComas(arregloDeDosComas, ins){
-	let arregloFinal = [];
 	if(arregloDeDosComas[2] == ',' && arregloDeDosComas[5] == ','){
-		arregloFinal = borrarElemento(arregloDeDosComas, ',');
-		instruccionCorrespondiente(ins, arregloFinal);
+		arregloFinalDosComas = borrarElemento(arregloDeDosComas, ',');
+		instruccionCorrespondiente(ins, arregloFinalDosComas);
 	}else{
 		imprimirError(errores["sintaxis"][1]);
 	}
 	// console.log(arregloDeDosComas);
-	console.log(arregloFinal);
-	return arregloFinal;
+	console.log(arregloFinalDosComas);
+	return arregloFinalDosComas;
 }
 
 function borrarElementoCadena(cadena, elemento){
@@ -225,10 +237,11 @@ function borrarElementoCadena(cadena, elemento){
 
 function imprimirError(error){
 	console.log("Error: " + error + " en la línea " + (contadorLineas + 1));
+	contadorErrores++;
 }
 
+var nuevoArregloFinal = [];
 function instruccionCorrespondiente(instruccion, arreglo){
-	let nuevoArregloFinal = [];
 	let variable = unirRegistros(arreglo);
 	if(variable.length == 2){
 		nuevoArregloFinal.push(instruccion, variable[0], variable[1]);
@@ -241,41 +254,58 @@ function instruccionCorrespondiente(instruccion, arreglo){
 	}
 }
 
+var arregloUnirRegistros = [];
 function unirRegistros(arregloDesordenado){
 	console.log(arregloDesordenado);
 	let a = arregloDesordenado.join('-');
 	// console.log(a);
 	var cad1, cad2, cad3;
-	let arr = [];
 	if(a.length == 7){ //r-X-r-Y
 		cad1 = borrarElementoCadena(a.slice(0, 3), '-');
 		cad2 = borrarElementoCadena(a.slice(4), '-');
-		arr.push(cad1);
-		arr.push(cad2);
+		arregloUnirRegistros.push(cad1);
+		arregloUnirRegistros.push(cad2);
 	}else if(a.length == 11){ //r-X-r-Y-r-Z
 		cad1 = borrarElementoCadena(a.slice(0, 3), '-');
 		cad2 = 	borrarElementoCadena(a.slice(4, 7), '-');
 		cad3 = 	borrarElementoCadena(a.slice(8), '-');
-		arr.push(cad1);
-		arr.push(cad2);
-		arr.push(cad3);
+		arregloUnirRegistros.push(cad1);
+		arregloUnirRegistros.push(cad2);
+		arregloUnirRegistros.push(cad3);
 	}else{
 		imprimirError(errores["desconocido"][1]);
 	}
-	console.log(arr);
-	return arr;
+	console.log(arregloUnirRegistros);
+	return arregloUnirRegistros;
 }
 
 function instruccionDeDosElementos(ins, operando1, operando2, arr){
 	//ANA arreglo = ["com", "rX", "rY"], ["com", "rX", "#Y"]
 	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1} y ${operando2}; el arreglo actual es ${arr}`);
-	evaluarComando(arr);
+	// evaluarComando(arr);
+	contadorLineas++;
+	if(contadorLineas == textoArr.length){
+		console.log("Final");
+	}else{
+		vaciarArreglos();
+		console.log("Siguiente línea");
+		ejecutarSiguienteInstruccion(contadorLineas);
+	}
+	
 }
 
 function instruccionDeTresElementos(ins, operando1, operando2, operando3, arr){
 	//GERARDO ["com", "rX", "rY", "rZ"]
 	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1}, ${operando2} y ${operando3}; el arreglo actual es ${arr}`);
-	evaluarComando(arr);
+	// evaluarComando(arr);
+	contadorLineas++;
+	if(contadorLineas == textoArr.length){
+		console.log("Final");
+	}else{
+		vaciarArreglos();
+		console.log("Siguiente línea");
+		ejecutarSiguienteInstruccion(contadorLineas);
+	}
 }
 
 
@@ -395,6 +425,14 @@ function contarCaracterCadena(cad, char){
 	return caracter;
 }
 
+function vaciarArreglos(){
+	arrParaAnalizarLaInstruccion.length = 0;
+	nuevoStr.length = 0;
+	arregloFinal.length = 0;
+	arregloFinalDosComas.length = 0;
+	nuevoArregloFinal.length = 0;
+	arregloUnirRegistros.length = 0;
+}
 
 var cont = 0;
 function generarRAM() {

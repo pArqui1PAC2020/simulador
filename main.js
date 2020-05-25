@@ -11,11 +11,14 @@ const errores = {
 		1: "Está tratando un espacio de memoria innaccesible",
 		2: "Error de almacenamiento",
 		3: "Error de carga",
-		4: "El dato inmediato es inválido"
+		4: "El dato inmediato es inválido",
+		5: "Valor de dato inmediato fuera de rango",
+		6: "Se ha producido un desbordamiento"
 	},
 	registro: {
 		1: "Muchos registros para esa instrucción",
-		2: "Dicha instrucción requiere de más registros"
+		2: "Dicha instrucción requiere de más registros",
+		3: "No se puede acceder al registro"
 	},
 	sintaxis: {
 		1: "Mala sintaxis al momento de usar los registros"
@@ -244,13 +247,15 @@ function imprimirError(error){
 	contadorErrores++;
 	if(error == errores["ejecucion"][1]){
 		// console.log("Error: " + error);
-		alert("Error: " + error);
+		// alert("Error: " + error);
+		mostrarError("Error: " + error);
 		mostrarEnMensajesErrorE1();
-		return false;
+		// return false;
 	}else{
-		alert("Error: " + error + " en la línea " + (contadorLineas + 1));
+		// alert("Error: " + error + " en la línea " + (contadorLineas + 1));
+		mostrarError("Error: " + error + " en la línea " + (contadorLineas + 1));
 		mostrarEnMensajesError();
-		return false;
+		// return false;
 	}
 }
 
@@ -314,13 +319,13 @@ function instruccionDeDosElementos(ins, operando1, operando2, arr){
 function instruccionDeTresElementos(ins, operando1, operando2, operando3, arr){
 	//GERARDO ["com", "rX", "rY", "rZ"]
 	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1}, ${operando2} y ${operando3}; el arreglo actual es ${arr}`);
-	// evaluarComando(arr);
 	contadorLineas++;
 	if(contadorLineas == textoArr.length || contadorLineas < textoArr.length){
 		console.log(contadorLineas);
 		if(borrarElementoCadena(textoArr[contadorLineas], ' ') == 'stop:wfi'){
 			console.log("Final de la ejecución");
 		}else{
+			evaluarComando(arr);
 			vaciarArreglos();
 			console.log("Siguiente línea");
 			ejecutarSiguienteInstruccion(contadorLineas);
@@ -504,11 +509,11 @@ function mostrarEnMensajesErrorE1(){
 	var errorE1;
 	for(errorE1 = 0; errorE1 < textoArr.length; errorE1++){
 		document.getElementById('errores').innerHTML += `
-			<p>${errorE1 + 1}  ${textoArr[errorE1]}</p>
+			<p>${errorE1 + 1} ->  ${textoArr[errorE1]}</p>
 		`;		
 	}
 	document.getElementById('errores').innerHTML += `
-		<p style="color: red">${errorE1 + 1}   stop: wfi</p>
+		<p style="color: red">${errorE1 + 1} ->  stop: wfi</p>
 	`;
 }
 
@@ -517,11 +522,11 @@ function mostrarEnMensajesError(){
 	for(errorNormal = 0; errorNormal < textoArr.length; errorNormal++){
 		if(errorNormal != contadorLineas){
 			document.getElementById('errores').innerHTML += `
-				<p>${errorNormal + 1}   ${textoArr[errorNormal]}</p>
+				<p>${errorNormal + 1} ->  ${textoArr[errorNormal]}</p>
 			`;
 		}else{
 			document.getElementById('errores').innerHTML += `
-				<p style="color: red">${errorNormal + 1}   ${textoArr[errorNormal]}</p>
+				<p style="color: red">${errorNormal + 1} ->  ${textoArr[errorNormal]}</p>
 			`;
 		}
 	}
@@ -537,10 +542,10 @@ function subCon2Registros(registro1, registro2){  //error
 	 let reg2=parseInt(registro2.charAt(1));
 	 //realizar que sean registros a los que el usuario pueda acceder
 	 if(reg1>=8){
-		mostrarError(`No se puede acceder al registro ${registro1}`)
+		imprimirError(errores["registro"][3] + registro1);
 	 }else{
 		if(reg2>=8){
-			mostrarError(`No se puede acceder al registro ${registro2}`)
+			imprimirError(errores["registro"][3] + registro2);
 		}else{
 			//necesitamos extraer el operando
 			let operando1="";
@@ -582,10 +587,10 @@ function subCon1RegistroY1DatoInmediato(rx, offet){
 	let offet8=parseInt(offet.charAt(1));
 	//realizar que sean registros a los que el usuario pueda acceder
 	if(reg>=8){
-		mostrarError(`No se puede acceder al registro ${reg}`)
+		imprimirError(errores["registro"][3] + reg);
 	}else{
 		if(offet8>255){
-		mostrarError("El valor del dato inmediado esta fuera del rango")
+		imprimirError(errores["espacio"][5]);
 		}else{
 			let operando1=""; //registro
 			let resultado;
@@ -704,7 +709,7 @@ function Ca2(resultado){ //solo recbe datos de 8 bits
 				
 				console.log("la suma es:",suma.reverse());
 				if(suma.length>8){
-					mostrarError("Se produjo un desbordamiento")
+					imprimirError(errores["espacio"][6]);
 				}
 				//expresarlo en hexadecimal
 				//pasarlo a k=32

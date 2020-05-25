@@ -21,13 +21,14 @@ const errores = {
 		3: "No se puede acceder al registro"
 	},
 	sintaxis: {
-		1: "Mala sintaxis al momento de usar los registros"
+		1: "Mala sintaxis al momento de usar la instrucción"
 	},
 	desconocido: {
 		1: "Error desconocido"
 	},
 	ejecucion: {
-		1: "Tiene que detener la ejecución del programa con el comando 'stop:wfi' al final del código"
+		1: "Tiene que detener la ejecución del programa con el comando 'stop:wfi' al final del código",
+		2: "Muchos elementos para una instrucción"
 	}
 };
 
@@ -175,37 +176,61 @@ var nuevoStr = []; //["r", "0", ",", "", "r", "1"]
 function existenciaDeInstruccion(instruccion){ //instrucción = "mov r0, r1"
 	let i = 0;
 	var bien = false;
+	var bien2 = false;
 	let arrParaAnalizarLosRegistros = [];
 	arrParaAnalizarLaInstruccion = instruccion.split(' '); //["mov", "r0,", "r1"] Separo cada instrucción en espacios y guardo cada elemento en un arreglo
-	while(i < comandos.length){
-		if(arrParaAnalizarLaInstruccion[0] == comandos[i]){ //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
-			bien = true;
-			for(let j = 4; j < instruccion.length; j++){
-				nuevoStr.push(instruccion.charAt(j));
-				nuevoStr = borrarElemento(nuevoStr, " ");
-			}
-			break;
-		}else{
-			i++;
-		}
-	}
+	 while(i < comandos.length){
+		 if(arrParaAnalizarLaInstruccion[0] == comandos[i]){ //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
+			 bien = true;
+			 if(arrParaAnalizarLaInstruccion.length == 3 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[2], ',') < 1){ //["ins", "r0,", "r1"] || ["ins", "r0,", "#A..."]
+				arrParaAnalizarLaInstruccion[1] = borrarElementoCadena(arrParaAnalizarLaInstruccion[1], ',');
+				bien2 = true;
+			 }else if(arrParaAnalizarLaInstruccion.length == 4 && contarCaracterCadena(arrParaAnalizarLaInstruccion[1], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[2], ',') == 1 && contarCaracterCadena(arrParaAnalizarLaInstruccion[3], ',') < 1){ //["ins", "r...,", "r...,", "r..."]
+				 arrParaAnalizarLaInstruccion[1] = borrarElementoCadena(arrParaAnalizarLaInstruccion[1], ',');
+				 arrParaAnalizarLaInstruccion[2] = borrarElementoCadena(arrParaAnalizarLaInstruccion[2], ',');
+				 bien2 = true;
+			 }else if(arrParaAnalizarLaInstruccion.length > 4){
+				imprimirError(errores["ejecucion"][2]);
+			 }else{
+				 imprimirError(errores["sintaxis"][1]);
+			 }
+			//  for(let j = 4; j < instruccion.length; j++){
+			// 	 nuevoStr.push(instruccion.charAt(j));
+			// 	 nuevoStr = borrarElemento(nuevoStr, " ");
+			//  }
+			 break;
+		 }else{
+			 i++;
+		 }
+	 }
+	 console.log(arrParaAnalizarLaInstruccion); //["ins", "op1", "op2"] || ["ins", "op1", "op2", "op3"]
 
-	if(bien == true){
-		if(contarCaracter(nuevoStr, ',') == 1){
-			console.log("bien"); 
-			existeUnaComa(nuevoStr, arrParaAnalizarLaInstruccion[0]);//Agregar filtro para localizar posición de la coma
-		}else if(contarCaracter(nuevoStr, ',') == 2){
-			console.log("bien"); 
-			existenDosComas(nuevoStr, arrParaAnalizarLaInstruccion[0]);//Agregar filtro para localizar posición de la coma
+	 if(bien == true && bien2 == true){
+		if(arrParaAnalizarLaInstruccion.length == 3){
+			instruccionDeDosElementos(arrParaAnalizarLaInstruccion[0], arrParaAnalizarLaInstruccion[1], arrParaAnalizarLaInstruccion[2], arrParaAnalizarLaInstruccion);
+		}else if(arrParaAnalizarLaInstruccion.length == 4){
+			instruccionDeTresElementos(arrParaAnalizarLaInstruccion[0], arrParaAnalizarLaInstruccion[1], arrParaAnalizarLaInstruccion[2], arrParaAnalizarLaInstruccion[3], arrParaAnalizarLaInstruccion);
 		}else{
-			imprimirError(errores["sintaxis"][1]); //bien = "s1"; //errores["sintaxis"][1];
+			imprimirError(errores["desconocido"][1]);
 		}
-	}else{
-		imprimirError(errores["comando"][1]); //bien = "c1";//errores["comando"][1]
-	}
-	console.log(nuevoStr);
-	console.log(bien);
-	return bien;
+	 }
+
+	// if(bien == true){
+		// if(contarCaracter(nuevoStr, ',') == 1){
+			// console.log("bien"); 
+			// existeUnaComa(nuevoStr, arrParaAnalizarLaInstruccion[0]);//Agregar filtro para localizar posición de la coma
+		// }else if(contarCaracter(nuevoStr, ',') == 2){
+			// console.log("bien"); 
+			// existenDosComas(nuevoStr, arrParaAnalizarLaInstruccion[0]);//Agregar filtro para localizar posición de la coma
+		// }else{
+			// imprimirError(errores["sintaxis"][1]); //bien = "s1"; //errores["sintaxis"][1];
+		// }
+	// }else{
+		// imprimirError(errores["comando"][1]); //bien = "c1";//errores["comando"][1]
+	// }
+	// console.log(nuevoStr);
+	// console.log(bien);
+	// return bien;
 
 }
 //rx,ry -- rx,#12,r3
@@ -214,10 +239,17 @@ function rXrY(rx, ry){
 }
 
 var arregloFinal = [];
-function existeUnaComa(arregloDeUnaComa, ins){
-	if(arregloDeUnaComa[2] == ','){
+function existeUnaComa(arregloDeUnaComa, ins){ //rX,rY -- rXY,rZ -- rZ,rXY -- rXY,rZZ -- rX,#A -- rX,#AB.. -- rXY,#AB...
+	if(arregloDeUnaComa[2] == ','){ //rX,rY -- rz,rXY -- rX,#A -- rX,#AB
 		arregloFinal = borrarElemento(arregloDeUnaComa, ',');
-		instruccionCorrespondiente(ins, arregloFinal);
+		console.log(arregloDeUnaComa);
+		console.log(arregloFinal);
+		// instruccionCorrespondiente(ins, arregloFinal);
+	}else if(arregloDeUnaComa[3] == ','){ //rXY,rZ -- rXY,rZZ
+		arregloFinal = borrarElemento(arregloDeUnaComa, ',');
+		console.log(arregloDeUnaComa);
+		console.log(arregloFinal);
+		// instruccionCorrespondiente(ins, arregloDeUnaComa);
 	}else{
 		imprimirError(errores["sintaxis"][1]);
 	}
@@ -274,7 +306,7 @@ function instruccionCorrespondiente(instruccion, arreglo){
 }
 
 var arregloUnirRegistros = [];
-function unirRegistros(arregloDesordenado){
+function unirRegistros(arregloDesordenado){ //r-X-Y-r-Z-Z || r-X-r-Y-Z || r-A-B-r-C-D-r-E-F
 	console.log(arregloDesordenado);
 	let a = arregloDesordenado.join('-');
 	// console.log(a);
@@ -284,13 +316,19 @@ function unirRegistros(arregloDesordenado){
 		cad2 = borrarElementoCadena(a.slice(4), '-');
 		arregloUnirRegistros.push(cad1);
 		arregloUnirRegistros.push(cad2);
-	}else if(a.length == 11){ //r-X-r-Y-r-Z
-		cad1 = borrarElementoCadena(a.slice(0, 3), '-');
-		cad2 = 	borrarElementoCadena(a.slice(4, 7), '-');
-		cad3 = 	borrarElementoCadena(a.slice(8), '-');
-		arregloUnirRegistros.push(cad1);
-		arregloUnirRegistros.push(cad2);
-		arregloUnirRegistros.push(cad3);
+	}else if(a.length == 11){ //r-X-r-Y-r-Z || r-X-Y-r-Z-Z
+		if(contarCaracter(a, 'r') == 3){
+			cad1 = borrarElementoCadena(a.slice(0, 3), '-');
+			cad2 = 	borrarElementoCadena(a.slice(4, 7), '-');
+			cad3 = 	borrarElementoCadena(a.slice(8), '-');
+			arregloUnirRegistros.push(cad1);
+			arregloUnirRegistros.push(cad2);
+			arregloUnirRegistros.push(cad3);
+		}else if(contarCaracter(a, 'r') == 2){
+
+		}
+	}else if(a.length == 9){ //r-X-r-Y-Z || r-X-#-A-B || r-X-Y-r-Z
+
 	}else{
 		imprimirError(errores["desconocido"][1]);
 	}
@@ -325,7 +363,7 @@ function instruccionDeTresElementos(ins, operando1, operando2, operando3, arr){
 		if(borrarElementoCadena(textoArr[contadorLineas], ' ') == 'stop:wfi'){
 			console.log("Final de la ejecución");
 		}else{
-			evaluarComando(arr);
+			// evaluarComando(arr);
 			vaciarArreglos();
 			console.log("Siguiente línea");
 			ejecutarSiguienteInstruccion(contadorLineas);

@@ -22,6 +22,9 @@ const errores = {
 	},
 	desconocido: {
 		1: "Error desconocido"
+	},
+	ejecucion: {
+		1: "Tiene que detener la ejecución del programa con el comando 'stop:wfi' al final del código"
 	}
 };
 
@@ -121,6 +124,7 @@ function ejecutar(){
 	// document.getElementById('area-de-codigo').value = null;
 	inicializar_registros();
 	inicializar_RAM();
+	document.getElementById('errores').innerHTML = '';
 	contadorErrores = 0;
 	contadorLineas = 0;
 	textoArr.length = 0;
@@ -142,19 +146,20 @@ function ejecutar(){
 	}
 	console.log(textoArr);
 	// while(contadorLineas < textoArr.length){
-		estado = existenciaDeInstruccion(textoArr[contadorLineas]); //con los espacios en blanco borrados, va recorriendo línea por línea para analizar el código
-		if(estado == true){ //función que analiza cada elemento del arreglo
-			console.log("bien"); //Si todo está bien, se pasa a la siguiente línea
-		}else if(estado == "s1"){
-			imprimirError(errores["sintaxis"][1]);
-			contadorLineas = textoArr.length;    
-		}else if(estado == "c1"){
-			imprimirError(errores["comando"][1]);
-			contadorLineas = textoArr.length;
+		// estado = existenciaDeInstruccion(textoArr[contadorLineas]); //con los espacios en blanco borrados, va recorriendo línea por línea para analizar el código
+		if(borrarElementoCadena(textoArr[textoArr.length - 1], ' ') == 'stop:wfi'){ //función que analiza cada elemento del arreglo
+			existenciaDeInstruccion(textoArr[contadorLineas]); //console.log("bien"); //Si todo está bien, se pasa a la siguiente línea
 		}else{
-			imprimirError(errores["desconocido"][1]);
-			contadorLineas = textoArr.length;
+			imprimirError(errores["ejecucion"][1]);
+			// contadorLineas = textoArr.length;
 		}
+		// else if(estado == "s1"){
+		// 	imprimirError(errores["sintaxis"][1]);
+		// 	contadorLineas = textoArr.length;    
+		// }else if(estado == "c1"){
+		// 	imprimirError(errores["comando"][1]);
+		// 	contadorLineas = textoArr.length;
+		// }
 	// }
 }
 
@@ -236,8 +241,17 @@ function borrarElementoCadena(cadena, elemento){
 }
 
 function imprimirError(error){
-	console.log("Error: " + error + " en la línea " + (contadorLineas + 1));
 	contadorErrores++;
+	if(error == errores["ejecucion"][1]){
+		// console.log("Error: " + error);
+		alert("Error: " + error);
+		mostrarEnMensajesErrorE1();
+		return false;
+	}else{
+		alert("Error: " + error + " en la línea " + (contadorLineas + 1));
+		mostrarEnMensajesError();
+		return false;
+	}
 }
 
 var nuevoArregloFinal = [];
@@ -284,12 +298,15 @@ function instruccionDeDosElementos(ins, operando1, operando2, arr){
 	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1} y ${operando2}; el arreglo actual es ${arr}`);
 	// evaluarComando(arr);
 	contadorLineas++;
-	if(contadorLineas == textoArr.length){
-		console.log("Final");
-	}else{
-		vaciarArreglos();
-		console.log("Siguiente línea");
-		ejecutarSiguienteInstruccion(contadorLineas);
+	if(contadorLineas == textoArr.length || contadorLineas < textoArr.length){
+		console.log(contadorLineas);
+		if(borrarElementoCadena(textoArr[contadorLineas], ' ') == 'stop:wfi'){
+			console.log("Final de la ejecución");
+		}else{
+			vaciarArreglos();
+			console.log("Siguiente línea");
+			ejecutarSiguienteInstruccion(contadorLineas);
+		}
 	}
 	
 }
@@ -299,12 +316,15 @@ function instruccionDeTresElementos(ins, operando1, operando2, operando3, arr){
 	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1}, ${operando2} y ${operando3}; el arreglo actual es ${arr}`);
 	// evaluarComando(arr);
 	contadorLineas++;
-	if(contadorLineas == textoArr.length){
-		console.log("Final");
-	}else{
-		vaciarArreglos();
-		console.log("Siguiente línea");
-		ejecutarSiguienteInstruccion(contadorLineas);
+	if(contadorLineas == textoArr.length || contadorLineas < textoArr.length){
+		console.log(contadorLineas);
+		if(borrarElementoCadena(textoArr[contadorLineas], ' ') == 'stop:wfi'){
+			console.log("Final de la ejecución");
+		}else{
+			vaciarArreglos();
+			console.log("Siguiente línea");
+			ejecutarSiguienteInstruccion(contadorLineas);
+		}
 	}
 }
 
@@ -479,3 +499,237 @@ function generarRegistros() {
 		 <td>${registros[j].contenido}</td></tr>`
 	}
 } generarRegistros();
+
+function mostrarEnMensajesErrorE1(){
+	var errorE1;
+	for(errorE1 = 0; errorE1 < textoArr.length; errorE1++){
+		document.getElementById('errores').innerHTML += `
+			<p>${errorE1 + 1}  ${textoArr[errorE1]}</p>
+		`;		
+	}
+	document.getElementById('errores').innerHTML += `
+		<p style="color: red">${errorE1 + 1}   stop: wfi</p>
+	`;
+}
+
+function mostrarEnMensajesError(){
+	var errorNormal;
+	for(errorNormal = 0; errorNormal < textoArr.length; errorNormal++){
+		if(errorNormal != contadorLineas){
+			document.getElementById('errores').innerHTML += `
+				<p>${errorNormal + 1}   ${textoArr[errorNormal]}</p>
+			`;
+		}else{
+			document.getElementById('errores').innerHTML += `
+				<p style="color: red">${errorNormal + 1}   ${textoArr[errorNormal]}</p>
+			`;
+		}
+	}
+}
+
+/**************************************************************funciones Gabriela*******************************/
+//suponiendo que se recibe [sub, rx,ry] 0 [sub,rx,rx]
+function subCon2Registros(registro1, registro2){  //error
+	/*identificar el registro para extraer el operando
+	  MODO DE DIRECCIONAMIENTO DE rx y ry : directo a registro*/
+	 //buscando el registro
+	 let reg1=parseInt(registro1.charAt(1));
+	 let reg2=parseInt(registro2.charAt(1));
+	 //realizar que sean registros a los que el usuario pueda acceder
+	 if(reg1>=8){
+		mostrarError(`No se puede acceder al registro ${registro1}`)
+	 }else{
+		if(reg2>=8){
+			mostrarError(`No se puede acceder al registro ${registro2}`)
+		}else{
+			//necesitamos extraer el operando
+			let operando1="";
+			let operando2=""
+			let resultado;
+			//extraer el contenido
+			for(let i=2; i<=9;i++){
+			 operando1+=registros[reg1].contenido.charAt(i);
+			 operando2+=registros[reg2].contenido.charAt(i);
+			}
+			//realizar la operacion
+			operando1=parseInt(operando1);
+			operando2=parseInt(operando2);
+			resultado=operando1-operando2;
+			resultado=resultado.toString(16); //convirtiendo a hexadecimal
+
+			//preparando resultado
+			let cantidadBytesResult=resultado.length;
+			let bytesAdd=(8-cantidadBytesResult);
+			let ceros=""
+			for(let i=0; i<bytesAdd;i++){
+				ceros+="0"
+			}
+			console.log("0x"+ceros+resultado)
+			//almacenar el resultado en los registros
+			registros[reg1].contenido=resultado;
+			console.log(registros)
+			
+
+		}
+	 }
+	
+}
+
+
+function subCon1RegistroY1DatoInmediato(rx, offet){
+	//el dato inmedito debe ser de 8 bits
+	let reg=parseInt(rx.charAt(1));
+	let offet8=parseInt(offet.charAt(1));
+	//realizar que sean registros a los que el usuario pueda acceder
+	if(reg>=8){
+		mostrarError(`No se puede acceder al registro ${reg}`)
+	}else{
+		if(offet8>255){
+		mostrarError("El valor del dato inmediado esta fuera del rango")
+		}else{
+			let operando1=""; //registro
+			let resultado;
+			//extraer el contenido
+			for(let i=2; i<=9;i++){
+			 operando1+=registros[reg].contenido.charAt(i);
+			}
+			operando1=parseInt(operando1);
+			resultado=operando1-offet8;
+			if(resultado<0){ //aplicar complemento a2 con k=32 bits
+				resultado= Ca2(resultado);
+				registros[reg].contenido=resultado;
+			}else{
+				resultado=resultado.toString(32); //convirtiendo a hexadecimal
+				//preparando resultado
+				let cantidadBytesResult2=resultado.length;
+				let bytesAdd=(8-cantidadBytesResult2);
+				let ceros=""
+				for(let i=0; i<bytesAdd;i++){
+					ceros+="0"
+				}
+				console.log("0x"+ceros+resultado)
+				resultado="0x"+ceros+resultado
+				console.log(registros[registros[reg].contenido])
+				//almacenar el resultado en los registros
+				registros[reg].contenido=resultado;
+
+			}
+			
+		}
+		generarRegistros()
+	}
+
+}
+
+//Esta funcion es para invertir el orden de una cadena
+String.prototype.reverse = function() {
+	var x = this.length;
+	var cadena = "";
+	while (x>=0) {
+		cadena = cadena + this.charAt(x);
+		x--;
+	}
+	return cadena;
+	
+};
+
+//Si un resultado de una operacion es negativo,se lo envian a esta funcion y ella lo convertira a Ca2
+//retorna el Ca2 del numero negativo expresado en hexadecimal con k=32
+function Ca2(resultado){ //solo recbe datos de 8 bits
+				resultado=Math.abs(resultado);
+				resultado=resultado.toString(2);
+				//expresar en 32bits
+				let cantidadBytesResult=resultado.length;
+				let cerosADD=(8-cantidadBytesResult);
+				let ceros=""
+				for(let i=0; i<cerosADD;i++){
+					ceros+="0"
+				}
+				resultado=ceros+resultado
+				console.log("paso1", resultado)
+				resultadoinvertido=""
+				for(let i=0; i<resultado.length;i++){
+					if(resultado.charAt(i)=='0'){
+						resultadoinvertido+='1';
+					}else{
+						resultadoinvertido+='0';
+					}
+				}
+				let id=0;
+				resultado=resultadoinvertido; //el sesultado ya esta invertido
+				console.log("paso2",resultado)
+				//sumarle un bit
+				let suma="";
+				let bitAcarreo='0';
+				let iteracion=0;
+				for(let i=0; i<resultado.length+1; i++){
+					id=resultado.length-iteracion;
+					console.log(id)
+					if(i==0){
+						if(resultado.charAt(id)=='1'){
+							bitAcarreo='1';
+						    suma+='0'
+						}else{
+							if(resultado.charAt(id)=='0'){
+								bitAcarreo='0';
+								suma+='1'
+							}
+						}
+					}else{
+						if(resultado.charAt(id)=='1' && bitAcarreo=='1'){
+							bitAcarreo='1';
+							suma+='0'
+						}else{
+							if(resultado.charAt(id)=='1' && bitAcarreo=='0'){
+								suma+='1';
+								bitAcarreo='0';
+							}else{
+								if(resultado.charAt(id)=='0' && bitAcarreo=='1'){
+									suma+='1'
+									bitAcarreo='0';
+								}else{
+									if(resultado.charAt(id)=='0'  && bitAcarreo=='0'){
+										suma+='0'
+										bitAcarreo='0'
+									}
+
+								}
+							}
+						}
+					}
+
+					iteracion++
+					
+				}
+				
+				console.log("la suma es:",suma.reverse());
+				if(suma.length>8){
+					mostrarError("Se produjo un desbordamiento")
+				}
+				//expresarlo en hexadecimal
+				//pasarlo a k=32
+				let cantidadBit1Ca2=suma.length;
+				let bitAdd1Ca2=(32-cantidadBit1Ca2);
+				let unos=""
+				for(let i=0; i<bitAdd1Ca2;i++){
+					unos+="1"
+				}
+				
+				let result=unos+suma.reverse()
+				console.log(result)
+				//suma es el resultado en Ca2
+				result=parseInt(result,2)
+				hexString=result.toString(16);
+				hexString=hexString.toUpperCase()
+				return "0x"+hexString;
+				//suma de binarios
+
+}
+
+
+
+//para mostrar un error solo llamen a esta funcion y le envian el mensaje
+function mostrarError(mensaje){
+	document.getElementById('error').innerHTML=mensaje;
+	$('#modal-error').modal('show');
+}

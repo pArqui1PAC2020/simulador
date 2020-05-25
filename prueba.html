@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input id="texto" type="text">
+
+    <script>
+
+        var hola = ['mov r0, r1', 'mov r0, r1, r2'];
+        var adios = ["hola", "-", "a", "-", "todos"];
+        var cadena = "hola a todos";
+        var otroArreglo = ['r', '1', 'r', '2', 'r', '3'];
+        console.log(borrarElemento(adios, "o"));
+        document.getElementById('texto').value = (forr(otroArreglo));
+        function borrarElemento(arr, elemento) {
+            return arr.filter( function( e ) {
+            return e !== elemento;
+             });
+        }
+
+        var otr = [1, 2, 3, 4, 5];
+        console.log(otr);
+        function borrarElementoCadena(cadena, elemento){
+            return cadena.split(elemento).join('');
+        }
+
+        function forr(arreglo){
+            console.log(arreglo);
+            let a = arreglo.join('-');
+            console.log(a);
+            let arr = []
+            var cad1, cad2, cad3;
+            if(a.length == 7){ //r-X-r-Y
+                cad1 = a.slice(0, 3);
+                cad2 = a.slice(4);
+                console.log(cad1);
+                console.log(cad2);
+            }else if(a.length == 11){
+                cad1 = borrarElementoCadena(a.slice(0, 3), '-');
+                cad2 = borrarElementoCadena(a.slice(4, 7), '-');
+                cad3 = borrarElementoCadena(a.slice(8), '-');
+                console.log(cad1);
+                console.log(cad2);
+                console.log(cad3);
+                arr.push(cad1, cad2, cad3);
+                console.log(arr);
+            }
+            
+        }
+
+        // otr.length = 0;
+        console.log(otr);
+    </script>
+</body>
+
+</html>

@@ -204,11 +204,23 @@ function existenciaDeInstruccion(instruccion){ //instrucción = "mov r0, r1"
 		 }
 	 }
 	 console.log(arrParaAnalizarLaInstruccion); //["ins", "op1", "op2"] || ["ins", "op1", "op2", "op3"]
-
+	 let c1, c2 = false;
 	 if(bien == true && bien2 == true){
 		if(arrParaAnalizarLaInstruccion.length == 3){
+			for(let i = 1; i < arrParaAnalizarLaInstruccion.length; i++){
+				if(arrParaAnalizarLaInstruccion[i].length > 2 && contarCaracterCadena(arrParaAnalizarLaInstruccion[i], 'r') > 0){
+					imprimirError(errores["registro"][3]);
+					break;
+				}
+			}
 			instruccionDeDosElementos(arrParaAnalizarLaInstruccion[0], arrParaAnalizarLaInstruccion[1], arrParaAnalizarLaInstruccion[2], arrParaAnalizarLaInstruccion);
 		}else if(arrParaAnalizarLaInstruccion.length == 4){
+			for(let j = 0; j < arrParaAnalizarLaInstruccion.length; j++){
+				if(arrParaAnalizarLaInstruccion[i].length > 2 && contarCaracterCadena(arrParaAnalizarLaInstruccion[i], 'r') > 0){
+					imprimirError(errores["registro"][3]);
+					break;
+				}
+			}
 			instruccionDeTresElementos(arrParaAnalizarLaInstruccion[0], arrParaAnalizarLaInstruccion[1], arrParaAnalizarLaInstruccion[2], arrParaAnalizarLaInstruccion[3], arrParaAnalizarLaInstruccion);
 		}else{
 			imprimirError(errores["desconocido"][1]);

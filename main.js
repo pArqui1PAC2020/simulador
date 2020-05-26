@@ -37,6 +37,22 @@ class Registro {
 		this.nombre = nombre;
 		this.contenido = contenido;
 	}
+
+	getNombre(){
+		return this.nombre;
+	}
+
+	getCletontenido(){
+		return this.contenido;
+	}
+
+	getContDecimal(){
+		let decimal = '';
+		let binario = String(this.contenido);
+		binario = binario.substr(2);
+		decimal = parseInt(binario, 2);
+		return decimal;
+	}
 }
 
 
@@ -126,8 +142,8 @@ var textoArr = [];
 //Es la primera función que se ejecuta al momento de dar clic el botón Ejecutar de index.html
 function ejecutar() {
 	// document.getElementById('area-de-codigo').value = null;
-	inicializar_registros();
-	inicializar_RAM();
+	// inicializar_registros();
+	// inicializar_RAM();
 	document.getElementById('errores').innerHTML = '';
 	contadorErrores = 0;
 	contadorLineas = 0;
@@ -153,7 +169,8 @@ function ejecutar() {
 	// estado = existenciaDeInstruccion(textoArr[contadorLineas]); //con los espacios en blanco borrados, va recorriendo línea por línea para analizar el código
 	if (borrarElementoCadena(textoArr[textoArr.length - 1], ' ') == 'stop:wfi') { //función que analiza cada elemento del arreglo
 		existenciaDeInstruccion(textoArr[contadorLineas]); //console.log("bien"); //Si todo está bien, se pasa a la siguiente línea
-	} else {
+	}
+	else {
 		imprimirError(errores["ejecucion"][1]);
 		// contadorLineas = textoArr.length;
 	}
@@ -171,6 +188,7 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1"
 	let bien2 = false;
 	let arrParaAnalizarLosRegistros = [];
 	arrParaAnalizarLaInstruccion = instruccion.split(' '); //["mov", "r0,", "r1"] Separo cada instrucción en espacios y guardo cada elemento en un arreglo
+
 	while (i < comandos.length) {
 		if (arrParaAnalizarLaInstruccion[0] == comandos[i]) { //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
 			bien = true;
@@ -191,8 +209,13 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1"
 			i++;
 		}
 	}
-
-	analisisFinal(bien, bien2);
+	if(bien == true && bien2 == true){
+		analisisFinal(bien, bien2);
+	}else if((i == comandos - 1) && bien == false){
+		imprimirError(errores["comando"][1]);
+	}else{
+		imprimirError(errores["desconocido"][1]);
+	}
 
 	// console.log(arrParaAnalizarLaInstruccion); //["ins", "op1", "op2"] || ["ins", "op1", "op2", "op3"]
 
@@ -569,6 +592,9 @@ function subCon2Registros(registro1, registro2) {  //error
 	//buscando el registro
 	let reg1 = parseInt(registro1.charAt(1));
 	let reg2 = parseInt(registro2.charAt(1));
+
+	// let reg1 = parseInt(borrarElementoCadena(registro1, ));
+
 	//realizar que sean registros a los que el usuario pueda acceder
 	if (reg1 >= 8) {
 		imprimirError(errores["registro"][3] + registro1);
@@ -613,7 +639,11 @@ function subCon2Registros(registro1, registro2) {  //error
 function subCon1RegistroY1DatoInmediato(rx, offet) {
 	//el dato inmedito debe ser de 8 bits
 	let reg = parseInt(rx.charAt(1));
-	let offet8 = parseInt(offet.charAt(1));
+	// let offet8 = parseInt(offet.charAt(1));
+
+	// let reg = parseInt(borrarElementoCadena(rx, 'r'));
+	let offet8 = parseInt(borrarElementoCadena(offet, '#'));
+
 	//realizar que sean registros a los que el usuario pueda acceder
 	if (reg >= 8) {
 		imprimirError(errores["registro"][3] + reg);
@@ -650,7 +680,7 @@ function subCon1RegistroY1DatoInmediato(rx, offet) {
 			}
 
 		}
-		generarRegistros()
+		generarRegistros();
 	}
 
 }
@@ -772,12 +802,12 @@ function mostrarError(mensaje) {
 
 /************************************funciones Gerardo*****************************************/
 function subCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
-	// let reg1 = parseInt(registro1.charAt(1));
-	// let reg2 = parseInt(registro2.charAt(1));
+	let reg1 = parseInt(registro1.charAt(1));
+	let reg2 = parseInt(registro2.charAt(1));
 	// let inm8 = parseInt(inm.charAt(1));
 
-	let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
-	let reg2 = parseInt(borrarElementoCadena(registro2, 'r'));
+	// let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
+	// let reg2 = parseInt(borrarElementoCadena(registro2, 'r'));
 	let inm8 = parseInt(borrarElementoCadena(inm, '#'));
 
 	if (reg1 >= 8) {

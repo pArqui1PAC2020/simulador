@@ -157,14 +157,6 @@ function ejecutar() {
 		imprimirError(errores["ejecucion"][1]);
 		// contadorLineas = textoArr.length;
 	}
-	// else if(estado == "s1"){
-	// 	imprimirError(errores["sintaxis"][1]);
-	// 	contadorLineas = textoArr.length;    
-	// }else if(estado == "c1"){
-	// 	imprimirError(errores["comando"][1]);
-	// 	contadorLineas = textoArr.length;
-	// }
-	// }
 }
 
 function ejecutarSiguienteInstruccion(numLinea) {
@@ -203,7 +195,7 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1"
 	analisisFinal(bien, bien2);
 
 	// console.log(arrParaAnalizarLaInstruccion); //["ins", "op1", "op2"] || ["ins", "op1", "op2", "op3"]
-	
+
 
 }
 
@@ -332,14 +324,17 @@ function unirRegistros(arregloDesordenado) { //r-X-Y-r-Z-Z || r-X-r-Y-Z || r-A-B
 
 function instruccionDeDosElementos(ins, operando1, operando2, arr) {
 	//ANA arreglo = ["com", "rX", "rY"], ["com", "rX", "#Y"]
+	let exe = false;
 	console.log(`Ha llegado hasta aquí con la instruccion: ${ins}, los operandos: ${operando1} y ${operando2}; el arreglo actual es ${arr}`);
 	// evaluarComando(arr);
 	contadorLineas++;
 	if (contadorLineas == textoArr.length || contadorLineas < textoArr.length) {
 		console.log(contadorLineas);
 		if (borrarElementoCadena(textoArr[contadorLineas], ' ') == 'stop:wfi') {
+			evaluarComando(arr);
 			console.log("Final de la ejecución");
 		} else {
+			evaluarComando(arr);
 			vaciarArreglos();
 			console.log("Siguiente línea");
 			ejecutarSiguienteInstruccion(contadorLineas);
@@ -356,9 +351,10 @@ function instruccionDeTresElementos(ins, operando1, operando2, operando3, arr) {
 	if (contadorLineas == textoArr.length || contadorLineas < textoArr.length) {
 		console.log(contadorLineas);
 		if (borrarElementoCadena(textoArr[contadorLineas], ' ') == 'stop:wfi') {
+			evaluarComando(arr);
 			console.log("Final de la ejecución");
 		} else {
-			// evaluarComando(arr);
+			evaluarComando(arr);
 			vaciarArreglos();
 			console.log("Siguiente línea");
 			ejecutarSiguienteInstruccion(contadorLineas);
@@ -530,7 +526,7 @@ function generarRAM() {
 } generarRAM();
 
 function generarRegistros() {
-	document.getElementById('registros').innerHTML = "";
+	document.getElementById('registros').innerHTML = '';
 	for (let j = 0; j < registros.length; j++) {
 		document.getElementById('registros').innerHTML += `<tr>
 		 <td>${registros[j].nombre}</td>
@@ -683,7 +679,7 @@ function Ca2(resultado) { //solo recbe datos de 8 bits
 	for (let i = 0; i < cerosADD; i++) {
 		ceros += "0"
 	}
-	resultado = ceros + resultado
+	resultado = ceros + resultado;
 	console.log("paso1", resultado)
 	resultadoinvertido = ""
 	for (let i = 0; i < resultado.length; i++) {
@@ -695,7 +691,7 @@ function Ca2(resultado) { //solo recbe datos de 8 bits
 	}
 	let id = 0;
 	resultado = resultadoinvertido; //el sesultado ya esta invertido
-	console.log("paso2", resultado)
+	console.log("paso2", resultado);
 	//sumarle un bit
 	let suma = "";
 	let bitAcarreo = '0';
@@ -771,3 +767,63 @@ function mostrarError(mensaje) {
 	document.getElementById('error').innerHTML = mensaje;
 	$('#modal-error').modal('show');
 }
+
+/***************************FIN funciones Gabriela *************************************/
+
+/************************************funciones Gerardo*****************************************/
+function subCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
+	// let reg1 = parseInt(registro1.charAt(1));
+	// let reg2 = parseInt(registro2.charAt(1));
+	// let inm8 = parseInt(inm.charAt(1));
+
+	let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
+	let reg2 = parseInt(borrarElementoCadena(registro2, 'r'));
+	let inm8 = parseInt(borrarElementoCadena(inm, '#'));
+
+	if (reg1 >= 8) {
+		imprimirError(errores["registro"][3] + registro1);
+	} else {
+		if (reg2 >= 8) {
+			imprimirError(errores["registro"][3] + registro2);
+		} else {
+			if (inm8 >= 255) {
+				imprimirError(errores["espacio"][5]);
+
+			} else {
+				if (registro1 == registro2) { //Caso sub rX, rX, #Y
+					subCon1RegistroY1DatoInmediato(registro1, inm);
+				} else {
+					let operando2 = ""
+					let resultado;
+					//extraer el contenido del registro
+					for (let i = 2; i <= 9; i++) {
+						operando2 += registros[reg2].contenido.charAt(i);
+					}
+
+					operando2 = parseInt(operando2);
+					resultado = operando2 - inm8;
+
+					if (resultado < 0) { //aplicar complemento a2 con k=32 bits
+						resultado = Ca2(resultado);
+						registros[reg1].contenido = resultado;
+					} else {
+						resultado = resultado.toString(16); //convirtiendo a hexadecimal
+						//preparando resultado
+						let cantidadBytesResult2 = resultado.length;
+						let bytesAdd = (8 - cantidadBytesResult2);
+						let ceros = "";
+						for (let i = 0; i < bytesAdd; i++) {
+							ceros += "0";
+						}
+						console.log("0x" + ceros + resultado);
+						resultado = "0x" + ceros + resultado;
+						console.log(registros[registros[reg1].contenido]);
+						//almacenar el resultado en los registros
+						registros[reg1].contenido = resultado;
+					}
+				}
+			}
+		}
+	}
+}
+/************************************FIN funciones Gerardo*****************************************/

@@ -38,15 +38,15 @@ class Registro {
 		this.contenido = contenido;
 	}
 
-	getNombre(){
+	getNombre() {
 		return this.nombre;
 	}
 
-	getContenido(){
+	getContenido() {
 		return this.contenido;
 	}
 
-	getContDecimal(){
+	getContDecimal() {
 		let decimal = '';
 		let binario = String(this.contenido);
 		binario = binario.substr(2);
@@ -54,7 +54,7 @@ class Registro {
 		return decimal;
 	}
 
-	vaciarContenido(){
+	vaciarContenido() {
 		return this.contenido = '0x00000000';
 	}
 }
@@ -139,12 +139,15 @@ console.log(RAM)
 // ]
 
 ROM = [];
+var inicio;
+var fin;
 var ejecucionn = 0;
 var contadorLineas = 0;
 var contadorErrores = 0;
 var textoArr = [];
 //Es la primera función que se ejecuta al momento de dar clic el botón Ejecutar de index.html
 function ejecutar() {
+	inicio = iniciando();
 	ejecucionn++;
 	// document.getElementById('area-de-codigo').value = null;
 	// inicializar_registros();
@@ -180,8 +183,8 @@ function ejecutar() {
 	}
 }
 
-function borrarRegistros(){
-	for(let i = 0; i < registros.length; i++){
+function borrarRegistros() {
+	for (let i = 0; i < registros.length; i++) {
 		registros[i].vaciarContenido();
 	}
 }
@@ -202,17 +205,18 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1" ||
 	// else
 	// 	arrParaAnalizarLaInstruccion = instruccion;
 
-	if(contarCaracterCadena(instruccion, ' ') == 1){ //mov r0,r1
+	if (contarCaracterCadena(instruccion, ' ') == 1) { //mov r0,r1
 		instruccion.replace(',', ' ');
 		arrParaAnalizarLaInstruccion = instruccion.split(' ');
 		console.log(arrParaAnalizarLaInstruccion);
-	}else if(contarCaracterCadena(instruccion, ' ') == 2){
+	} else if (contarCaracterCadena(instruccion, ' ') == 2) {
 		arrParaAnalizarLaInstruccion = instruccion.split(' ');
-	}else if(contarCaracterCadena(instruccion, ' ') > 2){
+	} else if (contarCaracterCadena(instruccion, ' ') > 2) {
 		arrParaAnalizarLaInstruccion = borrarElemento(instruccion.split(' '), '');
+		console.log(arrParaAnalizarLaInstruccion);
 	}
 
-	
+
 	while (i < comandos.length) {
 		if (arrParaAnalizarLaInstruccion[0] == comandos[i]) { //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
 			bien = true;
@@ -225,8 +229,8 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1" ||
 				bien2 = true;
 			} else if (arrParaAnalizarLaInstruccion.length > 4) {
 				imprimirError(errores["ejecucion"][2]);
-			}else if(arrParaAnalizarLaInstruccion.length == 2 && arrParaAnalizarLaInstruccion[1].charAt(2) == ',' && arrParaAnalizarLaInstruccion[1].charAt(5) != ','){
-				let temp1= ''; //temp1 = "r0,r1"
+			} else if (arrParaAnalizarLaInstruccion.length == 2 && arrParaAnalizarLaInstruccion[1].charAt(2) == ',' && arrParaAnalizarLaInstruccion[1].charAt(5) != ',') {
+				let temp1 = ''; //temp1 = "r0,r1"
 				let temp2 = '';
 				temp1 = arrParaAnalizarLaInstruccion[1];
 				arrParaAnalizarLaInstruccion.splice(1, 1);
@@ -237,7 +241,7 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1" ||
 				arrParaAnalizarLaInstruccion[1] = borrarElementoCadena(arrParaAnalizarLaInstruccion[1], ',');
 				console.log(arrParaAnalizarLaInstruccion);
 				bien2 = true;
-			}else if(arrParaAnalizarLaInstruccion.length == 2 && arrParaAnalizarLaInstruccion[1].charAt(2) == ',' && arrParaAnalizarLaInstruccion[1].charAt(5) == ','){
+			} else if (arrParaAnalizarLaInstruccion.length == 2 && arrParaAnalizarLaInstruccion[1].charAt(2) == ',' && arrParaAnalizarLaInstruccion[1].charAt(5) == ',') {
 				let t1, t2, t3 = '';
 				t1 = arrParaAnalizarLaInstruccion[1];
 				arrParaAnalizarLaInstruccion.splice(1, 1);
@@ -248,7 +252,7 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1" ||
 				arrParaAnalizarLaInstruccion[1] = borrarElementoCadena(arrParaAnalizarLaInstruccion[1], ',');
 				arrParaAnalizarLaInstruccion[2] = borrarElementoCadena(arrParaAnalizarLaInstruccion[2], ',');
 				bien2 = true;
-			}else {
+			} else {
 				imprimirError(errores["sintaxis"][1]);
 			}
 			break;
@@ -257,11 +261,11 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1" ||
 		}
 	}
 
-	if(bien == true && bien2 == true){
+	if (bien == true && bien2 == true) {
 		analisisFinal(bien, bien2);
-	}else if((i == comandos - 1) && bien == false && bien2 == false){
+	} else if ((i == comandos - 1) && bien == false && bien2 == false) {
 		imprimirError(errores["comando"][1]);
-	}else{
+	} else {
 		imprimirError(errores["desconocido"][1]);
 	}
 
@@ -295,7 +299,7 @@ function analisisFinal(bien, bien2) {
 
 }
 
-function quitarComa(array){
+function quitarComa(array) {
 	let askdj = [];
 
 }
@@ -490,7 +494,7 @@ function evaluarComando(arrComando) {
 			}
 			break;
 		case "mul": //mul rX, rY -- mul rX, rY, rX -- mul rX, rX, rY
-			if (arrComandos.length == 3) { //mul rX, rY
+			if (arrComando.length == 3) { //mul rX, rY
 				mulCon2Registros(arrComando[1], arrComando[2]); //GERARDO //En esta función (OJO)-->*TAMBIÉN*<--(OJO) se evaluarán errores	
 			} else {
 				mulCon3Registros(arrComando[1], arrComando[2], arrComando[3]); //GERARDO
@@ -611,28 +615,60 @@ function generarRegistros() {
 } generarRegistros();
 
 function mostrarEnMensajesErrorE1() {
-	var errorE1;
-	for (errorE1 = 0; errorE1 < textoArr.length; errorE1++) {
+	if(contadorLineas == textoArr.length - 1)
+	{	var errorE1;
+		for (errorE1 = 0; errorE1 < textoArr.length; errorE1++) {
+			document.getElementById('errores').innerHTML += `
+				<p>${errorE1 + 1} ->  ${textoArr[errorE1]}</p>
+			`;
+		}
 		document.getElementById('errores').innerHTML += `
-			<p>${errorE1 + 1} ->  ${textoArr[errorE1]}</p>
+			<p style="color: red">${errorE1 + 1} ->  stop: wfi</p>
 		`;
 	}
-	document.getElementById('errores').innerHTML += `
-		<p style="color: red">${errorE1 + 1} ->  stop: wfi</p>
-	`;
 }
 
 function mostrarEnMensajesError() {
-	var errorNormal;
-	for (errorNormal = 0; errorNormal < textoArr.length; errorNormal++) {
-		if (errorNormal != contadorLineas) {
+	if(contadorLineas == textoArr.length - 1)
+	{	var errorNormal;
+		for (errorNormal = 0; errorNormal < textoArr.length; errorNormal++) {
+			if (errorNormal != contadorLineas) {
+				document.getElementById('errores').innerHTML += `
+					<p>${errorNormal + 1} ->  ${textoArr[errorNormal]}</p>
+				`;
+			} else {
+				document.getElementById('errores').innerHTML += `
+					<p style="color: red">${errorNormal + 1} ->  ${textoArr[errorNormal]}</p>
+				`;
+			}
+		}
+	}
+}
+
+function mostrarEnMensajesExito(inicio, fin){
+	if(contadorLineas == textoArr.length - 1)
+	{	for(let i = 0; i < textoArr.length; i++){
 			document.getElementById('errores').innerHTML += `
-				<p>${errorNormal + 1} ->  ${textoArr[errorNormal]}</p>
-			`;
-		} else {
-			document.getElementById('errores').innerHTML += `
-				<p style="color: red">${errorNormal + 1} ->  ${textoArr[errorNormal]}</p>
-			`;
+					<p>${i + 1} ->  ${textoArr[i]}</p>
+				`;
+				
+		}
+		if((fin - inicio) < 10){
+			document.getElementById('errores').innerHTML +=  `
+					<p>Codigo ejecutado con exito en 0.00${fin - inicio} segundos</p>
+				`;
+		}else if((fin - inicio) > 9 && (fin - inicio) < 100){
+			document.getElementById('errores').innerHTML +=  `
+					<p>Codigo ejecutado con exito en 0.0${fin - inicio} segundos</p>
+				`;
+		}else if((fin - inicio) > 99 && (fin - inicio) < 1000){
+			document.getElementById('errores').innerHTML +=  `
+					<p>Codigo ejecutado con exito en 0.${fin - inicio} segundos</p>
+				`;
+		}else{
+			document.getElementById('errores').innerHTML +=  `
+					<p>Codigo ejecutado con exito en ${fin - inicio} segundos</p>
+				`;
 		}
 	}
 }
@@ -681,7 +717,8 @@ function subCon2Registros(registro1, registro2) {  //error
 			//almacenar el resultado en los registros
 			registros[reg1].contenido = resultado;
 			console.log(registros)
-
+			fin = finalizando();
+			mostrarEnMensajesExito(inicio, fin);
 
 		}
 	}
@@ -734,6 +771,8 @@ function subCon1RegistroY1DatoInmediato(rx, offet) {
 
 		}
 		generarRegistros();
+		fin = finalizando();
+		mostrarEnMensajesExito(inicio, fin);
 	}
 
 }
@@ -912,3 +951,131 @@ function subCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
 	// generarRegistros();
 }
 /************************************FIN funciones Gerardo*****************************************/
+
+/***************************************Funciones Angel copia************************************************/
+
+
+
+function addCon1RegistroY1DatoInmediato(rx, inm) {
+	//el dato inmedito debe ser de 8 bits
+	// let reg = parseInt(rx.charAt(1));
+	// let inm = parseInt(inm.substr(1));
+
+	let reg = parseInt(borrarElementoCadena(rx, 'r'));
+	let inm8 = parseInt(borrarElementoCadena(inm, '#'));
+	//Hacer que sean registros a los que el usuario pueda acceder
+	if (reg >= 8) {
+		imprimirError(errores["registro"][3]);
+	} else {
+		if (inm8 > 255) {
+			imprimirError(errores["espacio"][5]);
+		} else {
+			let operando1 = ""; //registro
+			let resultado;
+
+			//extraer el contenido
+			for (let i = 2; i <= 9; i++) {
+				operando1 += registros[reg].contenido.charAt(i);
+			}
+			operando1 = parseInt(operando1);
+			resultado = operando1 + inm8;
+			if (resultado < 0) { //aplicar complemento a2 con k=32 bits
+				resultado = Ca2(resultado);
+				registros[rgt].contenido = resultado;
+			} else {
+				resultado = resultado.toString(32); //convirtiendo a hexadecimal
+				//preparando resultado
+				let cantidadBytesResult2 = resultado.length;
+				let bytesAdd = (8 - cantidadBytesResult2);
+				let ceros = ""
+				for (let i = 0; i < bytesAdd; i++) {
+					ceros += "0"
+				}
+				console.log("0x" + ceros + resultado);
+				resultado = "0x" + ceros + resultado;
+				console.log(registros[registros[reg].contenido]);
+				//almacenar el resultado en los registros
+				registros[reg].contenido = resultado;
+
+			}
+
+		}
+		generarRegistros();
+		fin = finalizando();
+		mostrarEnMensajesExito(inicio, fin);
+	}
+
+}
+
+
+
+
+function addCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
+	// let reg1 = parseInt(registro1.charAt(1));
+	// let reg2 = parseInt(register2.charAt(1));
+	// let inm8 = parseInt(inm.substr(1));
+
+	let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
+	let reg2 = parseInt(borrarElementoCadena(registro2, 'r'));
+	let inm8 = parseInt(borrarElementoCadena(inm, '#'));
+
+
+
+	if (reg1 >= 8) {
+		imprimirError(errores["registro"][3] + registro1);
+	} else {
+		if (reg2 >= 8) {
+			imprimirError(errores["registro"][3] + registro2);
+		} else {
+			if (inm8 >= 255) {
+				imprimirError(errores["espacio"][5]);
+
+			} else {
+				if (registro1 == registro2) { //
+				} else {
+					let operando2 = ""
+					let resultado;
+					//extraer el contenido del registro
+					for (let i = 2; i <= 9; i++) {
+						operando2 += registros[reg2].contenido.charAt(i);
+					}
+
+					operando2 = parseInt(operando2);
+					resultado = operando2 + inm8;
+
+					if (resultado < 0) { //aplicar complemento a2 con k=32 bits
+						resultado = Ca2(resultado);
+						registros[reg1].contenido = resultado;
+					} else {
+						resultado = resultado.toString(16); //convirtiendo a hexadecimal
+						//preparando resultado
+						let cantidadBytesResult2 = resultado.length;
+						let bytesAdd = (8 - cantidadBytesResult2);
+						let ceros = "";
+						for (let i = 0; i < bytesAdd; i++) {
+							ceros += "0";
+						}
+						console.log("0x" + ceros + resultado);
+						resultado = "0x" + ceros + resultado;
+						console.log(registros[registros[reg1].contenido]);
+						//almacenar el resultado en los registros
+						registros[reg1].contenido = resultado;
+					}
+				}
+			}
+		}
+		generarRegistros();
+		fin = finalizando();
+		mostrarEnMensajesExito(inicio, fin);
+	}
+}
+
+/*********************************************************Fin Funciones Angel copia***************************************************/
+function iniciando(){
+	return new Date().getTime();
+}
+
+function finalizando(){
+	return new Date().getTime();
+}
+

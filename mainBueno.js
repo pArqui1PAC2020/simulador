@@ -165,20 +165,18 @@ function ejecutar() {
 		textoArr = texto.value.split('\n');
 	}											//guarda en el arreglo textoArr todas las palabras separadas por un salto de línea
 	console.log(textoArr);
+	console.log(contarCaracterCadena(texto.value, '\n'));
 	for (let i = 0; i < textoArr.length; i++) {		/** recorre el arreglo para encontrar espacios en blanco y borrarlos*/
 		if (textoArr[i] == "") {
 			textoArr = borrarElemento(textoArr, textoArr[i]); //Borra todos los espacios en blanco del arreglo
 		}
 	}
 	console.log(textoArr);
-	// while(contadorLineas < textoArr.length){
-	// estado = existenciaDeInstruccion(textoArr[contadorLineas]); //con los espacios en blanco borrados, va recorriendo línea por línea para analizar el código
 	if (borrarElementoCadena(textoArr[textoArr.length - 1], ' ') == 'stop:wfi') { //función que analiza cada elemento del arreglo
 		existenciaDeInstruccion(textoArr[contadorLineas]); //console.log("bien"); //Si todo está bien, se pasa a la siguiente línea
 	}
 	else {
 		imprimirError(errores["ejecucion"][1]);
-		// contadorLineas = textoArr.length;
 	}
 }
 
@@ -194,13 +192,27 @@ function ejecutarSiguienteInstruccion(numLinea) {
 
 var arrParaAnalizarLaInstruccion = [];
 var nuevoStr = []; //["r", "0", ",", "", "r", "1"]
-function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1"
+function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1" || "mov r0,     r1" || "mov r0,r1"
 	let i = 0;
 	let bien = false;
 	let bien2 = false;
 	let arrParaAnalizarLosRegistros = [];
-	arrParaAnalizarLaInstruccion = instruccion.split(' '); //["mov", "r0,", "r1"] Separo cada instrucción en espacios y guardo cada elemento en un arreglo
+	// if(contarCaracterCadena(instruccion, ' ') > 0)
+	// 	arrParaAnalizarLaInstruccion = instruccion.split(' '); //["mov", "r0,", "r1"] Separo cada instrucción en espacios y guardo cada elemento en un arreglo
+	// else
+	// 	arrParaAnalizarLaInstruccion = instruccion;
 
+	if(contarCaracterCadena(instruccion, ' ') == 1){ //mov r0,r1
+		instruccion.replace(',', ' ');
+		arrParaAnalizarLaInstruccion = instruccion.split(' ');
+		console.log(arrParaAnalizarLaInstruccion);
+	}else if(contarCaracterCadena(instruccion, ' ') == 2){
+		arrParaAnalizarLaInstruccion = instruccion.split(' ');
+	}else if(contarCaracterCadena(instruccion, ' ') > 2){
+		arrParaAnalizarLaInstruccion = borrarElemento(instruccion.split(' '), '');
+	}
+
+	
 	while (i < comandos.length) {
 		if (arrParaAnalizarLaInstruccion[0] == comandos[i]) { //comparo ese primer elemento con las instrucciones que ya están guardadas en comandos
 			bien = true;
@@ -213,7 +225,30 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1"
 				bien2 = true;
 			} else if (arrParaAnalizarLaInstruccion.length > 4) {
 				imprimirError(errores["ejecucion"][2]);
-			} else {
+			}else if(arrParaAnalizarLaInstruccion.length == 2 && arrParaAnalizarLaInstruccion[1].charAt(2) == ',' && arrParaAnalizarLaInstruccion[1].charAt(5) != ','){
+				let temp1= ''; //temp1 = "r0,r1"
+				let temp2 = '';
+				temp1 = arrParaAnalizarLaInstruccion[1];
+				arrParaAnalizarLaInstruccion.splice(1, 1);
+				temp2 = temp1.slice(3);
+				temp1 = temp1.slice(0, 3);
+				arrParaAnalizarLaInstruccion.push(temp1);
+				arrParaAnalizarLaInstruccion.push(temp2);
+				arrParaAnalizarLaInstruccion[1] = borrarElementoCadena(arrParaAnalizarLaInstruccion[1], ',');
+				console.log(arrParaAnalizarLaInstruccion);
+				bien2 = true;
+			}else if(arrParaAnalizarLaInstruccion.length == 2 && arrParaAnalizarLaInstruccion[1].charAt(2) == ',' && arrParaAnalizarLaInstruccion[1].charAt(5) == ','){
+				let t1, t2, t3 = '';
+				t1 = arrParaAnalizarLaInstruccion[1];
+				arrParaAnalizarLaInstruccion.splice(1, 1);
+				t3 = t1.slice(6);
+				t2 = t1.slice(3, 6);
+				t1 = t1.slice(0, 3);
+				arrParaAnalizarLaInstruccion.push(t1, t2, t3);
+				arrParaAnalizarLaInstruccion[1] = borrarElementoCadena(arrParaAnalizarLaInstruccion[1], ',');
+				arrParaAnalizarLaInstruccion[2] = borrarElementoCadena(arrParaAnalizarLaInstruccion[2], ',');
+				bien2 = true;
+			}else {
 				imprimirError(errores["sintaxis"][1]);
 			}
 			break;
@@ -221,6 +256,7 @@ function existenciaDeInstruccion(instruccion) { //instrucción = "mov r0, r1"
 			i++;
 		}
 	}
+
 	if(bien == true && bien2 == true){
 		analisisFinal(bien, bien2);
 	}else if((i == comandos - 1) && bien == false && bien2 == false){
@@ -256,6 +292,11 @@ function analisisFinal(bien, bien2) {
 			imprimirError(errores["desconocido"][1]);
 		}
 	}
+
+}
+
+function quitarComa(array){
+	let askdj = [];
 
 }
 

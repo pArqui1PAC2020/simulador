@@ -33,7 +33,8 @@ const errores = {
     },
     reserva: {
         1: "No existe el comando para iniciar la reserva de memoria (.data)",
-        2: "Etiqueta ya existente"
+        2: "Etiqueta ya existente",
+        3: "No es un valor válido"s
     }
 };
 
@@ -1068,9 +1069,9 @@ var Etiquetas = []; ///este arreglo tendra las etiquetas que se reserven
 //el numero vendria en hexadecimal "0x20304050"
 addEtiqueta("etiqueta", "0", "0x20304050")
 function addEtiqueta(nombre, puntero, contenido) {
-    Etiquetas.push(new Etiqueta(nombre, puntero, contenido))
+    Etiquetas.push(new Etiqueta(nombre, puntero, contenido));
 }
-console.log(Etiquetas)
+console.log(Etiquetas);
 //una vez que termine de llenar el arreglo etiquetas lo ejecuta y despues ejecuta las instrucciones que esten despues de .text
 //para ejecutar el arreglo etiquetas se hara lo siguiente
 //funcion para ejecutar todas las etiquetas
@@ -2013,5 +2014,33 @@ function verificarPalabraWord(){
 
 function verificarNumero(){
     let bien = false;
+
+    //.data
+    // e1: .word 123
     
+    for(let i = 0; i < Object.keys(jsonEtiquetas).length; i++){
+        let contenido = jsonEtiquetas[arrEtiquetasTemp[i]].substr(5);
+        
+        console.log(jsonEtiquetas[arrEtiquetasTemp[i]]);
+        x = Number(contenido);
+
+        if(Number.isInteger(x)){
+            bien = true;
+            let nombre = arrEtiquetasTemp[i];
+            let puntero=0;
+            if(i==0){
+                addEtiqueta(nombre, puntero, x);
+            }else{
+                for(let j=1; j<arrEtiquetasTemp.length; j++){
+                    puntero += 4;
+                    addEtiqueta(nombre,puntero,x);
+                }
+            }
+        }else{
+            imprimirError(errores["reserva"][3]);
+            bien = false;
+            break;
+        }
+    }
+    ejecutarReservas();
 }

@@ -745,6 +745,8 @@ function subCon2Registros(registro1, registro2) {  //error
 			}
 			console.log(registros)
 			generarRegistros();
+			fin = finalizando();
+			mostrarEnMensajesExito(inicio, fin);
 		}
 	}
 
@@ -802,6 +804,8 @@ function subCon1RegistroY1DatoInmediato(rx, offet) {
 			}
 		}
 		generarRegistros();
+		fin = finalizando();
+		mostrarEnMensajesExito(inicio, fin);
 	}
 }
 
@@ -934,56 +938,58 @@ function subCon3Registros(registro1, registro2,registro3){
 			}else{
 
 				//necesitamos extraer el operando
-			let operando1;
-			let operando2;
-			let operando3;
-			let resultado;
-			//extraer el contenido
-			/*for (let i = 2; i <= 9; i++) {
-				operando1 += registros[reg1].contenido.charAt(i);
-				operando2 += registros[reg2].contenido.charAt(i);
-			}*/
-			operando1 = registros[reg1].contenido
-			operando2 = registros[reg2].contenido
-			operando3 = registros[reg3].contenido
-			if(operando1.charAt(2)=='F'){
-				operando1=registros[reg1].contenidoCa2;
-			}else{
-				if(operando2.charAt(2)=='F'){
-				  operando2=registros[reg2].contenidoCa2;
+				let operando1;
+				let operando2;
+				let operando3;
+				let resultado;
+				//extraer el contenido
+				/*for (let i = 2; i <= 9; i++) {
+					operando1 += registros[reg1].contenido.charAt(i);
+					operando2 += registros[reg2].contenido.charAt(i);
+				}*/
+				operando1 = registros[reg1].contenido
+				operando2 = registros[reg2].contenido
+				operando3 = registros[reg3].contenido
+				if(operando1.charAt(2)=='F'){
+					operando1=registros[reg1].contenidoCa2;
 				}else{
-					if(operando3.charAt(2)=='F'){
-						operando3=registros[reg3].contenidoCa2;
-					  }
+					if(operando2.charAt(2)=='F'){
+					operando2=registros[reg2].contenidoCa2;
+					}else{
+						if(operando3.charAt(2)=='F'){
+							operando3=registros[reg3].contenidoCa2;
+						}
+					}
 				}
-			}
-			//realizar la operacion
-			operando1 = parseInt(operando1);
-			operando2 = parseInt(operando2);
-			operando3 = parseInt(operando3);
-			resultado = operando2 - operando3;
-			let tempCa2=resultado;
-			if(resultado<0){
-				resultado = Ca2(resultado+1);
-				registros[reg1].contenido = resultado;
-				registros[reg1].contenidoCa2 = tempCa2;
+				//realizar la operacion
+				operando1 = parseInt(operando1);
+				operando2 = parseInt(operando2);
+				operando3 = parseInt(operando3);
+				resultado = operando2 - operando3;
+				let tempCa2=resultado;
+				if(resultado<0){
+					resultado = Ca2(resultado+1);
+					registros[reg1].contenido = resultado;
+					registros[reg1].contenidoCa2 = tempCa2;
+					console.log(registros)
+				}else{
+					resultado = resultado.toString(16); //convirtiendo a hexadecimal
+					//preparando resultado
+					let cantidadBytesResult = resultado.length;
+					let bytesAdd = (8 - cantidadBytesResult);
+					let ceros = ""
+					for (let i = 0; i<bytesAdd; i++) {
+						ceros += "0"
+					}
+					console.log("0x" + ceros + resultado)
+					//almacenar el resultado en los registros
+					registros[reg1].contenido = "0x"+ceros+resultado;
+					
+				}
 				console.log(registros)
-			}else{
-				resultado = resultado.toString(16); //convirtiendo a hexadecimal
-			//preparando resultado
-			let cantidadBytesResult = resultado.length;
-			let bytesAdd = (8 - cantidadBytesResult);
-			let ceros = ""
-			for (let i = 0; i<bytesAdd; i++) {
-				ceros += "0"
-			}
-			console.log("0x" + ceros + resultado)
-			//almacenar el resultado en los registros
-			registros[reg1].contenido = "0x"+ceros+resultado;
-			
-			}
-			console.log(registros)
-			generarRegistros();
+				generarRegistros();
+				fin = finalizando();
+				mostrarEnMensajesExito(inicio, fin);
 			}
 		}
 	}
@@ -1131,6 +1137,8 @@ function ldrEtiqueta(registro, etiqueta){
 			registros[indexRegistro].contenidoCa2=0;
 			generarRegistros();
 			//ldrGuardarDesdeRAM("r0","r1")
+			fin = finalizando();
+			mostrarEnMensajesExito(inicio, fin);
 		}
 
 	}
@@ -1351,6 +1359,7 @@ function mulCon3Registros(registro1, registro2, registro3){
 						}
 
 						resultado = operando2*operando3;
+						resultado = 80;
 
 						if (resultado < 0) { //aplicar complemento a2 con k=32 bits
 							registros[reg1].contenidoCa2 = resultado;
@@ -1358,20 +1367,19 @@ function mulCon3Registros(registro1, registro2, registro3){
 							resultado = Ca2(resultado+1);
 							registros[reg1].contenido = resultado;
 						} else {
-							resultado = resultado.toString(16); //convirtiendo a hexadecimal
 
+							resultado = resultado.toString(16); //convirtiendo a hexadecimal
 							//preparando resultado
-							let cantidadBytesResult2 = resultado.length;
-							let bytesAdd = (8 - cantidadBytesResult2);
-							let ceros = "";
-							for (let i = 0; i < bytesAdd; i++) {
+							let cantidadBytesResult = resultado.length;
+							let bytesAdd = (8 - cantidadBytesResult);
+							let ceros = ""
+							for (let i = 0; i<bytesAdd; i++) {
 								ceros += "0";
 							}
-							console.log("0x" + ceros + resultado);
-							resultado = "0x" + ceros + resultado;
-							console.log(registros[registros[reg1].contenido]);
+							console.log("0x" + ceros + resultado)
 							//almacenar el resultado en los registros
-							registros[reg1].contenido = resultado;
+							registros[reg1].contenido = "0x"+ceros+resultado;
+
 						}
 						generarRegistros();
 						fin = finalizando();
@@ -1417,7 +1425,7 @@ function addCon1RegistroY1DatoInmediato(rx, inm) {
 				resultado = Ca2(resultado);
 				registros[rgt].contenido = resultado;
 			} else {
-				resultado = resultado.toString(32); //convirtiendo a hexadecimal
+				resultado = resultado.toString(16); //convirtiendo a hexadecimal
 				//preparando resultado
 				let cantidadBytesResult2 = resultado.length;
 				let bytesAdd = (8 - cantidadBytesResult2);
@@ -1508,9 +1516,9 @@ function addCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
 
 function addCon3Registros(registro1, registro2, registro3) {  
 	
-	let reg1 = parseInt(registro1.charAt(1));
-	let reg2 = parseInt(registro2.charAt(1));
-	let reg3 = parseInt(registro3.charAt(1));
+	// let reg1 = parseInt(registro1.charAt(1));
+	// let reg2 = parseInt(registro2.charAt(1));
+	// let reg3 = parseInt(registro3.charAt(1));
 
 
 	let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));

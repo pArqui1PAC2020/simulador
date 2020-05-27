@@ -28,7 +28,8 @@ const errores = {
 	},
 	ejecucion: {
 		1: "Tiene que detener la ejecución del programa con el comando 'stop:wfi' al final del código",
-		2: "Muchos elementos para una instrucción"
+		2: "Muchos elementos para una instrucción",
+		3: "La operación lógica solo acepta trabajar con registros"
 	}
 };
 
@@ -1576,9 +1577,200 @@ function addCon3Registros(registro1, registro2, registro3) {
 
 }
 
-
-
 /*********************************************************Fin Funciones Angel copia***************************************************/
+
+
+/**********************************funciones Jonathan*******************************/
+
+function and(registro1, registro2) {
+
+    if (registro1.charAt(0) != 'r') {
+        imprimirError(errores["ejecucion"][3] + registro1);
+    } else {
+        if (registro2.charAt(0) != 'r') {
+            imprimirError(errores["ejecucion"][3] + registro2);
+
+        }
+
+        let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
+        let reg2 = parseInt(borrarElementoCadena(registro2, 'r'));
+
+
+        //como dijeron hay que ver si son registros accesibles
+        if (reg1 >= 8) {
+            imprimirError(errores["registro"][3] + registro1);
+
+        } else {
+            if (reg2 >= 8) {
+                imprimirError(errores["registro"][3] + registro2);
+
+            } else {
+
+                //acordarse de que el registro es asi 0x00000000
+                elemento1Binario = parseInt(registros[reg1].contenido).toString(2);
+                elemento2Binario = parseInt(registros[reg2].contenido).toString(2);
+
+                console.log(elemento1Binario);
+                console.log(elemento2Binario);
+
+
+
+                elemento1Completo = agregarCerosPara32bits(elemento1Binario);
+                elemento2Completo = agregarCerosPara32bits(elemento2Binario);
+
+
+                let mascara = "";
+
+                console.log(elemento1Completo.length);
+                console.log(elemento2Completo.length);
+
+                for (let i = 0; i < 32; i++) {
+                    if (elemento1Completo.charAt(i) == elemento2Completo.charAt(i)) {
+                        if (elemento1Completo.charAt(i) == 0) {
+                            mascara += "0";
+                        } else if (elemento1Completo.charAt(i) == 1) {
+                            mascara += "1";
+                        }
+                    } else {
+                        mascara += "0";
+                    }
+                }
+
+
+                console.log(mascara);
+
+                indicePrimer1 = mascara.indexOf("1");
+                cadenaFinal = mascara.slice(indicePrimer1);
+                console.log(cadenaFinal);
+                cadenaFinal = (parseInt(cadenaFinal, 2));
+                console.log(cadenaFinal);
+
+                resultado = cadenaFinal.toString(16) //convirtiendo a hexadecimal
+                resultado = resultado.toUpperCase();
+                //preparando resultado
+                let cantidadBytesResult2 = resultado.length;
+                let bytesAdd = (8 - cantidadBytesResult2);
+                let ceros = ""
+                for (let i = 0; i < bytesAdd; i++) {
+                    ceros += "0"
+                }
+                console.log("0x" + ceros + resultado)
+                resultado = ("0x" + ceros + resultado);
+                console.log(registros[reg1].contenido);
+                //almacenar el resultado en los registros
+                registros[reg1].contenido = resultado;
+
+            }
+            generarRegistros();
+            fin = finalizando();
+            mostrarEnMensajesExito(inicio, fin);
+        }
+
+
+    }
+
+}
+
+
+function agregarCerosPara32bits(elemento) {
+
+    tamanioElem = elemento.length;
+    console.log('tamanio elemento en binarop: ' + tamanioElem);
+    cerosFaltantes = (32 - tamanioElem);
+    let cerosElem = "";
+
+    for (let i = 0; i < cerosFaltantes; i++) {
+        cerosElem += "0";
+    }
+
+    elemento = cerosElem + elemento;
+    return elemento;
+}
+
+
+function not(elemento1, elemento2) {
+
+}
+
+
+
+function eor(registro1, registro2) {
+
+    let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
+    let reg2 = parseInt(borrarElementoCadena(registro2, 'r'));
+
+
+    //como dijeron hay que ver si son registros accesibles
+    if (reg1 >= 8) {
+        imprimirError(errores["registro"][3] + registro1);
+
+    } else {
+        if (reg2 >= 8) {
+            imprimirError(errores["registro"][3] + registro2);
+
+        } else {
+
+            //acordarse de que el registro es asi 0x00000000
+            elemento1Binario = parseInt(registros[reg1].contenido).toString(2);
+            elemento2Binario = parseInt(registros[reg2].contenido).toString(2);
+
+
+            elemento1Completo = agregarCerosPara32bits(elemento1Binario);
+            elemento2Completo = agregarCerosPara32bits(elemento2Binario);
+
+
+            let mascara = "";
+
+            console.log(elemento1Completo.length);
+            console.log(elemento2Completo.length);
+
+            for (let i = 0; i < 32; i++) {
+                if (elemento1Completo.charAt(i) == elemento2Completo.charAt(i)) {
+                    if (elemento1Completo.charAt(i) == 0) {
+                        mascara += "0";
+                    } else if (elemento1Completo.charAt(i) == 1) {
+                        mascara += "0";
+                    }
+                } else {
+                    mascara += "1";
+                }
+            }
+
+
+            console.log(mascara);
+
+            indicePrimer1 = mascara.indexOf("1");
+            cadenaFinal = mascara.slice(indicePrimer1);
+            console.log(cadenaFinal);
+            cadenaFinal = (parseInt(cadenaFinal, 2));
+            console.log(cadenaFinal);
+
+            resultado = cadenaFinal.toString(16) //convirtiendo a hexadecimal
+            resultado = resultado.toUpperCase();
+            //preparando resultado
+            let cantidadBytesResult2 = resultado.length;
+            let bytesAdd = (8 - cantidadBytesResult2);
+            let ceros = ""
+            for (let i = 0; i < bytesAdd; i++) {
+                ceros += "0"
+            }
+            console.log("0x" + ceros + resultado)
+            resultado = ("0x" + ceros + resultado);
+            console.log(registros[reg1].contenido);
+            //almacenar el resultado en los registros
+            registros[reg1].contenido = resultado;
+
+
+        }
+        generarRegistros();
+        fin = finalizando();
+        mostrarEnMensajesExito(inicio, fin);
+    }
+}
+
+
+/**********************************FIN funciones Jonathan*******************************/
+
 function iniciando(){
 	return new Date().getTime();
 }

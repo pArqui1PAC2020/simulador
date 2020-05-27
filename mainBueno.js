@@ -34,7 +34,7 @@ const errores = {
     reserva: {
         1: "No existe el comando para iniciar la reserva de memoria (.data)",
         2: "Etiqueta ya existente",
-        3: "No es un valor válido"s
+        3: "No es un valor válido"
     }
 };
 

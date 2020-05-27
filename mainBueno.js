@@ -32,97 +32,9 @@ const errores = {
 	}
 };
 
-class Registro {
-	constructor(nombre, contenido) {
-		this.nombre = nombre;
-		this.contenido = contenido;
-	}
-
-	getNombre() {
-		return this.nombre;
-	}
-
-	getContenido() {
-		return this.contenido;
-	}
-
-	getContDecimal() {
-		let decimal = '';
-		let binario = String(this.contenido);
-		binario = binario.substr(2);
-		decimal = parseInt(binario, 2);
-		return decimal;
-	}
-
-	vaciarContenido() {
-		return this.contenido = '0x00000000';
-	}
-}
-
-
-class Byte {
-	constructor(dir_memoria, contenido) {
-		this.dir_memoria = dir_memoria;
-		this.contenido = contenido;
-	}
-}
-
 //declarando variables y arreglos
 var registros = [];
 var RAM = [];
-
-
-function inicializar_registros() {
-	//declarar un arreglo con los registros inicializandolos en 0
-
-	var inicio = 0000000;
-	var inicioHexa = inicio.toString(16); // A la base 16
-	//console.log("El número decimal %s en hexadecimal es %s", decimal, decimalEnHexadecimal);
-
-	for (let i = 0; i < 16; i++) {
-		if (i >= 13) {
-			switch (i) {
-				case 13:
-					registros.push(new Registro(`r${i} (SP)`, "0x" + "00000000"))
-					break;
-				case 14:
-					registros.push(new Registro(`r${i} (LR)`, "0x" + "00000000"))
-					break;
-				case 15:
-					registros.push(new Registro(`r${i} (PC)`, "0x" + "00180000"))
-					break;
-			}
-		} else {
-			let nombre = `r${i}`
-			registros.push(new Registro(nombre, "0x" + "00000000"))
-		}
-
-	}
-
-	console.log(registros);
-
-
-
-} inicializar_registros();
-
-
-//inicializando la memoria RAM
-function inicializar_RAM() {
-	var inicio = 0000000;
-	var inicioHexa = inicio.toString(16); // A la base 16
-	//console.log("El número decimal %s en hexadecimal es %s", decimal, decimalEnHexadecimal);
-	for (let i = 0; i < 40; i++) {
-		if (i <= 9) {
-			RAM.push(new Byte(`0x2007000${i}`, "00"))
-		}
-		else {
-			RAM.push(new Byte(`0x200700${i}`, "00"))
-		}
-
-	}
-
-} inicializar_RAM();
-console.log(RAM)
 
 //a = ["mov r0, r1", "mov r1, r2", "stop: wfi"]
 //a = [["mov", "r0", "r1"], ]
@@ -568,52 +480,6 @@ function vaciarArreglos() {
 	arregloUnirRegistros.length = 0;
 }
 
-var cont = 0;
-function generarRAM() {
-
-	for (let i = 0; i < RAM.length; i++) {
-		if (i <= 16) {
-			if (cont == 0) {
-				document.getElementById('espacio1').innerHTML = `<td>0x20070000</td>`
-				cont = 1;
-			} else {
-				document.getElementById('espacio1').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
-			}
-		} else {
-			if (i > 15 && i <= 33) {
-				if (cont == 1) {
-					document.getElementById('espacio2').innerHTML = `<td>0x20070010</td>`
-					cont = 2;
-				} else {
-					document.getElementById('espacio2').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
-				}
-
-			} else {
-				if (cont == 2) {
-					document.getElementById('espacio3').innerHTML = `<td>0x20070020</td>`
-					cont = 3;
-				} else {
-					document.getElementById('espacio3').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
-				}
-			}
-		}
-	}
-	for (let j = 0; j < 11; j++) {
-		document.getElementById('espacio3').innerHTML += `<td style="padding:10px; color:#878787">00</td>`
-	}
-
-
-} generarRAM();
-
-function generarRegistros() {
-	document.getElementById('registros').innerHTML = '';
-	for (let j = 0; j < registros.length; j++) {
-		document.getElementById('registros').innerHTML += `<tr>
-		 <td>${registros[j].nombre}</td>
-		 <td>${registros[j].contenido}</td></tr>`
-	}
-} generarRegistros();
-
 function mostrarEnMensajesErrorE1() {
 	if(contadorLineas == textoArr.length - 1)
 	{	var errorE1;
@@ -673,7 +539,151 @@ function mostrarEnMensajesExito(inicio, fin){
 	}
 }
 
-/**************************************************************funciones Gabriela*******************************/
+
+
+/********************************************FUNCIONES GABRIELA CON CORRECCIONES**********************************************/
+
+class Registro {
+	constructor(nombre, contenido,contenidoCa2) {
+		this.nombre = nombre;
+		this.contenido = contenido;
+		this.contenidoCa2=contenidoCa2;
+	}
+	getNombre(){
+		return this.nombre;
+	}
+	getContenido(){
+		return this.contenido;
+	}
+	getContenidoCa2(){
+		return this.contenido;
+	}
+	getContDecimal(){
+		let decimal = '';
+		let binario = String(this.contenido);
+		binario = binario.substr(2);
+		decimal = parseInt(binario, 2);
+		return decimal;
+	}
+
+	vaciarContenido(){
+		return this.contenido = '0x00000000';
+	}
+}
+
+
+class Byte {
+	constructor(dir_memoria, contenido) {
+		this.dir_memoria = dir_memoria;
+		this.contenido = contenido;
+	}
+}
+
+function inicializar_registros() {
+	//declarar un arreglo con los registros inicializandolos en 0
+
+	var inicio = 0000000;
+	var inicioHexa = inicio.toString(16); // A la base 16
+	//console.log("El número decimal %s en hexadecimal es %s", decimal, decimalEnHexadecimal);
+
+	for (let i = 0; i < 16; i++) {
+		if (i >= 13) {
+			switch (i) {
+				case 13:
+					registros.push(new Registro(`r${i} (SP)`, "0x" + "00000000",0))
+					break;
+				case 14:
+					registros.push(new Registro(`r${i} (LR)`, "0x" + "00000000",0))
+					break;
+				case 15:
+					registros.push(new Registro(`r${i} (PC)`, "0x" + "00180000",0))
+					break;
+			}
+		} else {
+			let nombre = `r${i}`
+			registros.push(new Registro(nombre, "0x" + "00000000",0))
+		}
+
+	}
+
+	console.log(registros);
+
+
+
+} inicializar_registros();
+
+
+//inicializando la memoria RAM
+function inicializar_RAM() {
+	var inicio = 0000000;
+	var inicioHexa = inicio.toString(16); // A la base 16
+	//console.log("El número decimal %s en hexadecimal es %s", decimal, decimalEnHexadecimal);
+	for (let i = 0; i < 40; i++) {
+		if (i <= 9) {
+			RAM.push(new Byte(`0x2007000${i}`, "00"))
+		}
+		else {
+			RAM.push(new Byte(`0x200700${i}`, "00"))
+		}
+
+	}
+
+} inicializar_RAM();
+console.log(RAM)
+
+
+var cont = 0;
+function generarRAM(){ //correccion
+	cont=0;
+	document.getElementById('espacio1').innerHTML="";
+	document.getElementById('espacio2').innerHTML="";
+	document.getElementById('espacio3').innerHTML="";
+	for (let i = 0; i < RAM.length; i++) {
+		if (i < 16) {
+			if (cont == 0) {
+				document.getElementById('espacio1').innerHTML+= `<td>0x20070000</td>`
+				document.getElementById('espacio1').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
+				cont = 1;
+			} else {
+				document.getElementById('espacio1').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
+			}
+		} else {
+			if (i >= 15 && i <32) {
+				if (cont == 1) {
+					document.getElementById('espacio2').innerHTML+= `<td>0x20070010</td>`
+					document.getElementById('espacio2').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
+					cont = 2;
+				} else {
+					document.getElementById('espacio2').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
+				}
+
+			} else {
+				if (cont == 2) {
+					document.getElementById('espacio3').innerHTML += `<td>0x20070020</td>`
+					document.getElementById('espacio3').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
+					cont = 3;
+				} else {
+					document.getElementById('espacio3').innerHTML += `<td style="padding:10px">${RAM[i].contenido}</td>`
+				}
+			}
+		}
+	}
+	for (let j = 0; j < 8; j++) {
+		document.getElementById('espacio3').innerHTML += `<td style="padding:10px; color:#878787">00</td>`
+	}
+
+
+} generarRAM();
+
+function generarRegistros() {
+	document.getElementById('registros').innerHTML = '';
+	for (let j = 0; j < registros.length; j++) {
+		document.getElementById('registros').innerHTML += `<tr>
+		 <td>${registros[j].nombre}</td>
+		 <td>${registros[j].contenido}</td></tr>`
+	}
+} generarRegistros();
+
 //suponiendo que se recibe [sub, rx,ry] 0 [sub,rx,rx]
 function subCon2Registros(registro1, registro2) {  //error
 	/*identificar el registro para extraer el operando
@@ -681,9 +691,7 @@ function subCon2Registros(registro1, registro2) {  //error
 	//buscando el registro
 	let reg1 = parseInt(registro1.charAt(1));
 	let reg2 = parseInt(registro2.charAt(1));
-
 	// let reg1 = parseInt(borrarElementoCadena(registro1, ''));
-
 	//realizar que sean registros a los que el usuario pueda acceder
 	if (reg1 >= 8) {
 		imprimirError(errores["registro"][3] + registro1);
@@ -692,48 +700,64 @@ function subCon2Registros(registro1, registro2) {  //error
 			imprimirError(errores["registro"][3] + registro2);
 		} else {
 			//necesitamos extraer el operando
-			let operando1 = "";
-			let operando2 = ""
+			let operando1;
+			let operando2;
 			let resultado;
 			//extraer el contenido
-			for (let i = 2; i <= 9; i++) {
+			/*for (let i = 2; i <= 9; i++) {
 				operando1 += registros[reg1].contenido.charAt(i);
 				operando2 += registros[reg2].contenido.charAt(i);
+			}*/
+			operando1 = registros[reg1].contenido
+			operando2 = registros[reg2].contenido
+			console.log(operando1.charAt(2),operando2.charAt(2))
+			if(operando1.charAt(2)=='F'){
+				operando1=registros[reg1].contenidoCa2;
+			}else{
+				if(operando2.charAt(2)=='F'){
+				  operando2=registros[reg2].contenidoCa2;
+				  console.log(operando2)
+				}
 			}
 			//realizar la operacion
 			operando1 = parseInt(operando1);
 			operando2 = parseInt(operando2);
+			console.log("restar",operando1,operando2)
 			resultado = operando1 - operando2;
-			resultado = resultado.toString(16); //convirtiendo a hexadecimal
-
+			let tempCa2=resultado;
+			if(resultado<0){
+				resultado = Ca2(resultado+1);
+				registros[reg1].contenido = resultado;
+				registros[reg1].contenidoCa2 = tempCa2;
+				console.log(registros)
+			}else{
+				resultado = resultado.toString(16); //convirtiendo a hexadecimal
 			//preparando resultado
 			let cantidadBytesResult = resultado.length;
 			let bytesAdd = (8 - cantidadBytesResult);
 			let ceros = ""
-			for (let i = 0; i < bytesAdd; i++) {
+			for (let i = 0; i<bytesAdd; i++) {
 				ceros += "0"
 			}
 			console.log("0x" + ceros + resultado)
 			//almacenar el resultado en los registros
-			registros[reg1].contenido = resultado;
+			registros[reg1].contenido = "0x"+ceros+resultado;
+			}
 			console.log(registros)
-			fin = finalizando();
-			mostrarEnMensajesExito(inicio, fin);
-
+			generarRegistros();
 		}
 	}
 
 }
 
 
+
 function subCon1RegistroY1DatoInmediato(rx, offet) {
 	//el dato inmedito debe ser de 8 bits
 	// let reg = parseInt(rx.charAt(1));
 	// let offet8 = parseInt(offet.charAt(1));
-
 	let reg = parseInt(borrarElementoCadena(rx, 'r'));
 	let offet8 = parseInt(borrarElementoCadena(offet, '#'));
-
 	//realizar que sean registros a los que el usuario pueda acceder
 	if (reg >= 8) {
 		imprimirError(errores["registro"][3] + reg);
@@ -744,14 +768,23 @@ function subCon1RegistroY1DatoInmediato(rx, offet) {
 			let operando1 = ""; //registro
 			let resultado;
 			//extraer el contenido
-			for (let i = 2; i <= 9; i++) {
+			/*for (let i = 2; i <= 9; i++) {
 				operando1 += registros[reg].contenido.charAt(i);
+			}*/
+			operando1 = registros[reg].contenido;
+			if(operando1.charAt(2)=='F'){
+				operando1=registros[reg].contenidoCa2;
 			}
 			operando1 = parseInt(operando1);
 			resultado = operando1 - offet8;
+			let tempResultNeg=resultado; //CORRECCION: guardo el resultado en esta variable por si es negativa
 			if (resultado < 0) { //aplicar complemento a2 con k=32 bits
-				resultado = Ca2(resultado);
-				registros[reg].contenido = resultado;
+				//resultado = ((0xFFFFFFFF+(resultado)-1)+2).toString(16) //ignoren eso
+				resultado=parseInt(resultado,10)
+				resultado=Ca2(resultado+1)
+				registros[reg].contenido = resultado; //CORRECCION: guardo el resultado en Ca2
+				registros[reg].contenidoCa2 = tempResultNeg;//CORRECCION: guardo el resultado en decimal ejemplo -2
+				console.log(registros)//CORRECCION: al imprimir el registro pueden ver que ya se modifico el campo
 			} else {
 				resultado = resultado.toString(32); //convirtiendo a hexadecimal
 				//preparando resultado
@@ -766,16 +799,12 @@ function subCon1RegistroY1DatoInmediato(rx, offet) {
 				console.log(registros[registros[reg].contenido]);
 				//almacenar el resultado en los registros
 				registros[reg].contenido = resultado;
-
 			}
-
 		}
 		generarRegistros();
-		fin = finalizando();
-		mostrarEnMensajesExito(inicio, fin);
 	}
-
 }
+
 
 //Esta funcion es para invertir el orden de una cadena
 String.prototype.reverse = function () {
@@ -788,6 +817,8 @@ String.prototype.reverse = function () {
 	return cadena;
 
 };
+
+
 
 //Si un resultado de una operacion es negativo,se lo envian a esta funcion y ella lo convertira a Ca2
 //retorna el Ca2 del numero negativo expresado en hexadecimal con k=32
@@ -883,6 +914,277 @@ function Ca2(resultado) { //solo recbe datos de 8 bits
 }
 
 
+function subCon3Registros(registro1, registro2,registro3){
+	/*identificar el registro para extraer el operando
+	  MODO DE DIRECCIONAMIENTO DE rx y ry : directo a registro*/
+	//buscando el registro
+	let reg1 = parseInt(registro1.charAt(1));
+	let reg2 = parseInt(registro2.charAt(1));
+	let reg3 = parseInt(registro3.charAt(1));
+	// let reg1 = parseInt(borrarElementoCadena(registro1, ''));
+	//realizar que sean registros a los que el usuario pueda acceder
+	if (reg1 >= 8) {
+		imprimirError(errores["registro"][3] + registro1)
+	} else{
+		if (reg2 >= 8) {
+			imprimirError(errores["registro"][3] + registro2);
+		}else{
+			if (reg3 >= 8) {
+				imprimirError(errores["registro"][3] + registro3);
+			}else{
+
+				//necesitamos extraer el operando
+			let operando1;
+			let operando2;
+			let operando3;
+			let resultado;
+			//extraer el contenido
+			/*for (let i = 2; i <= 9; i++) {
+				operando1 += registros[reg1].contenido.charAt(i);
+				operando2 += registros[reg2].contenido.charAt(i);
+			}*/
+			operando1 = registros[reg1].contenido
+			operando2 = registros[reg2].contenido
+			operando3 = registros[reg3].contenido
+			if(operando1.charAt(2)=='F'){
+				operando1=registros[reg1].contenidoCa2;
+			}else{
+				if(operando2.charAt(2)=='F'){
+				  operando2=registros[reg2].contenidoCa2;
+				}else{
+					if(operando3.charAt(2)=='F'){
+						operando3=registros[reg3].contenidoCa2;
+					  }
+				}
+			}
+			//realizar la operacion
+			operando1 = parseInt(operando1);
+			operando2 = parseInt(operando2);
+			operando3 = parseInt(operando3);
+			resultado = operando2 - operando3;
+			let tempCa2=resultado;
+			if(resultado<0){
+				resultado = Ca2(resultado+1);
+				registros[reg1].contenido = resultado;
+				registros[reg1].contenidoCa2 = tempCa2;
+				console.log(registros)
+			}else{
+				resultado = resultado.toString(16); //convirtiendo a hexadecimal
+			//preparando resultado
+			let cantidadBytesResult = resultado.length;
+			let bytesAdd = (8 - cantidadBytesResult);
+			let ceros = ""
+			for (let i = 0; i<bytesAdd; i++) {
+				ceros += "0"
+			}
+			console.log("0x" + ceros + resultado)
+			//almacenar el resultado en los registros
+			registros[reg1].contenido = "0x"+ceros+resultado;
+			
+			}
+			console.log(registros)
+			generarRegistros();
+			}
+		}
+	}
+
+
+			
+		
+	
+}
+
+//////////////////////////////////////////FUNCIONES PARA LAS OPERACIONES LDR Y STR///////////////////////////////////////////////////////////////
+/*PRIMERO:
+-al escribir .data empezarian las intrucciones de carga en la RAM
+-identificar el comando etiqueta: word x (Se guardaria un dato menor o igual a k=32)
+-Esto caeria a la funcion addEtiqueta() como ["etiqueta","puntero","contenido"]
+
+*/
+class Etiqueta {
+	constructor(nombre,puntero,contenido) {
+		this.nombre = nombre;
+		this.puntero = puntero;
+		this.contenido = contenido;
+	}
+}
+
+
+var Etiquetas=[]; ///este arreglo tendra las etiquetas que se reserven
+
+//esta funcion se ejecutaria cada vez que se encuentre una instruccion tal como etiqueta: word 0, enviandole ["etiqueta","puntero","contenido"]
+//en el filtro cada vez que encuentre una instruccion diferente le va sumando 4 al puntero
+//el filtro debe dejar ingresar cualquier numero despues de .word 
+//el numero vendria en hexadecimal "0x20304050"
+addEtiqueta("etiqueta","0","0x20304050")
+function addEtiqueta(nombre,puntero,contenido){
+	Etiquetas.push(new Etiqueta(nombre,puntero,contenido))
+}
+console.log(Etiquetas)
+//una vez que termine de llenar el arreglo etiquetas lo ejecuta y despues ejecuta las instrucciones que esten despues de .text
+//para ejecutar el arreglo etiquetas se hara lo siguiente
+//funcion para ejecutar todas las etiquetas
+function ejecutarReservas(){
+	if(Etiquetas.length>0){//comprobando que el arreglo no este vacio
+		for(let i=0; i<Etiquetas.length;i++){//para ejecutar cada una
+			guardarContenidoEnRam(Etiquetas[i].nombre,Etiquetas[i].puntero,Etiquetas[i].contenido);//esta funcion estaria guardando el contenido en RAM
+		}
+	}
+}ejecutarReservas()
+
+
+
+//funcion ara guardar una palabra en RAM //ejemplo etiqueta
+function guardarContenidoEnRam(nombre,puntero,contenido){ 
+	//preparar el contenido
+	//el contenido viene en una cadena hexadecimal
+		let contenidoInt=parseInt(contenido);//convirtiendolo a entero
+	//Filtro uno:comprobar si el numero puede almacenarce en k=32 bits
+	if(contenidoInt>=-2147483647 && contenidoInt<= 2147483647){
+		//guardar el contenido en RAM en hexadecimal pero en little endian
+		//tenemos 4 bytes disponibles:
+		let palabra=[]
+		palabra[0]=""; 
+		palabra[1]=""; 
+		palabra[2]=""; 
+		palabra[3]=""; 
+		//separar cadena
+		//hago esto para dividir el 0x20304060 a 0x20,0x30, 0x40, 0x50 para guardarlas en little endian
+		if(contenido.charAt(2)){
+			palabra[0]+=contenido.charAt(2)
+		}
+		if(contenido.charAt(3)){
+			palabra[0]+=contenido.charAt(3)
+		}
+		if(contenido.charAt(4)){
+			palabra[1]+=contenido.charAt(4)
+		}
+		if(contenido.charAt(5)){
+			palabra[1]+=contenido.charAt(5)
+		}
+		if(contenido.charAt(6)){
+			palabra[2]+=contenido.charAt(6)
+		}
+		if(contenido.charAt(7)){
+			palabra[2]+=contenido.charAt(7)
+		}
+		if(contenido.charAt(8)){
+			palabra[3]+=contenido.charAt(8)
+		}
+		if(contenido.charAt(9)){
+			palabra[3]+=contenido.charAt(9)
+		}
+
+		console.log(palabra)
+		//guardando el contenido en la RAM 
+		let iterar=1
+		for(let i=parseInt(puntero); i<palabra.length;i++){
+			RAM[parseInt(puntero)].contenido=palabra[palabra.length-iterar]
+			puntero++
+			iterar++
+		}
+		console.log(RAM);
+		generarRAM()
+	}else{
+		//lanzar error
+	}
+
+}
+
+//funcion para guardar la etiqueta en en un registro
+/*
+Ejemplo ldr r0,=etiqueta
+La funcion recibe el nombre de la etiqueta
+*/
+//ldrEtiqueta("r1", "etiqueta")//probando la funcion
+
+function ldrEtiqueta(registro, etiqueta){
+	//primero comprobar si la etiqueta existe,buscarla en el arreglo ETIQUEtAS
+	let existe=false;
+	let index;
+	let puntero;
+	for(let i=0; i<Etiquetas.length;i++){
+		if(Etiquetas[i].nombre==etiqueta){
+			puntero=Etiquetas[i].puntero
+			existe=true;
+		}
+	}
+
+	if(!existe){
+		//Lanzar error porque la etiqueta no existe
+	}else{//si existe
+		//obtener la direccion de memoria en la RAM
+		let direccion=RAM[puntero].dir_memoria;
+		let indexRegistro;
+		//identificar el registro
+		for(let i=0; i<registros.length;i++){
+			if(registros[i].nombre==registro){
+				indexRegistro=i;
+			}
+		}
+		//comprobar si el registro se puede usar
+		if(parseInt((registros[indexRegistro].nombre).slice(-2))>=8){
+			console.error("el registro no se puede usar")
+		}else{
+			//guardarla en el registro
+			registros[indexRegistro].contenido=direccion;
+			registros[indexRegistro].contenidoCa2=0;
+			generarRegistros();
+			//ldrGuardarDesdeRAM("r0","r1")
+		}
+
+	}
+
+}
+
+
+//funcion de carga en registros, ejemplo ldr,r1 [r2] , ldr,r1,*r2 (podriamos usarla de esta forma)
+function ldrGuardarDesdeRAM(registro_destino,registro_fuente){
+	//identificar registros
+	let indexRegistro1;
+	let indexRegistro2;
+	for(let i=0; i<registros.length;i++){
+		if(registros[i].nombre==registro_destino){
+			indexRegistro1=i;
+		}
+		if(registros[i].nombre==registro_fuente){
+			indexRegistro2=i;
+		}
+		
+	}
+
+	let punteroEnRAM;
+	if(parseInt((registros[indexRegistro1].nombre).slice(-2))>=8){
+		console.error("el registro no se puede usar")
+	}else{
+		if(parseInt((registros[indexRegistro2].nombre).slice(-2))>=8){
+			console.error("el registro no se puede usar")
+		}else{
+			//obtener el resultado de la RAM
+			for(let i=0; i<RAM.length;i++){
+				if(RAM[i].dir_memoria==registros[indexRegistro2].contenido){
+					//obtener el resultado
+					punteroEnRAM=i
+				}
+			}
+
+			let valor="";
+			//obtener el valor de la RAM
+			for(let i=punteroEnRAM;i<4;i++){
+				valor+=RAM[3-punteroEnRAM].contenido;
+				punteroEnRAM++
+			}
+			valor="0x"+valor
+			//guarda el resultad en registro
+			registros[indexRegistro1].contenido=valor;
+			generarRegistros();
+			console.log(registros)
+		}
+	}
+	//verificar que los registros se puedan usar
+
+}
+
 
 //para mostrar un error solo llamen a esta funcion y le envian el mensaje
 function mostrarError(mensaje) {
@@ -890,7 +1192,7 @@ function mostrarError(mensaje) {
 	$('#modal-error').modal('show');
 }
 
-/***************************FIN funciones Gabriela *************************************/
+/********************************************FIN DE FUNCIONES GABRIELA**************************************/
 
 /************************************funciones Gerardo*****************************************/
 function subCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
@@ -915,21 +1217,25 @@ function subCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
 				if (registro1 == registro2) { //Caso sub rX, rX, #Y
 					subCon1RegistroY1DatoInmediato(registro1, inm);
 				} else {
-					let operando2 = ""
+					let operando2 = registros[reg2].contenido;//extraer el contenido del registro
 					let resultado;
-					//extraer el contenido del registro
-					for (let i = 2; i <= 9; i++) {
-						operando2 += registros[reg2].contenido.charAt(i);
+
+					if(operando2.charAt[2] == 'F'){ 
+						operando2 = operando3.contenidoCa2;
+					}else{
+						operando2 = parseInt(operando2)
 					}
 
-					operando2 = parseInt(operando2);
 					resultado = operando2 - inm8;
 
 					if (resultado < 0) { //aplicar complemento a2 con k=32 bits
-						resultado = Ca2(resultado);
+						registros[reg1].contenidoCa2 = resultado;
+						
+						resultado = Ca2(resultado-1);
 						registros[reg1].contenido = resultado;
 					} else {
 						resultado = resultado.toString(16); //convirtiendo a hexadecimal
+
 						//preparando resultado
 						let cantidadBytesResult2 = resultado.length;
 						let bytesAdd = (8 - cantidadBytesResult2);
@@ -943,12 +1249,140 @@ function subCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
 						//almacenar el resultado en los registros
 						registros[reg1].contenido = resultado;
 					}
+					generarRegistros();
+					fin = finalizando();
+					mostrarEnMensajesExito(inicio, fin);
 				}
 			}
 		}
 	}
+}
 
-	// generarRegistros();
+function mulCon2Registros(registro1, registro2){
+
+	let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
+	let reg2 = parseInt(borrarElementoCadena(registro2, 'r'));
+
+	if (reg1 >= 8) {
+		imprimirError(errores["registro"][3] + registro1);
+	} else {
+		if (reg2 >= 8) {
+			imprimirError(errores["registro"][3] + registro2);
+		}else{
+			let operando1 = registros[reg1].contenido;
+			let operando2 = registros[reg2].contenido;
+			let resultado;
+
+			//Verificamos si los registros tienen numeros negativos
+			if(operando1.charAt[2] == 'F'){ 
+				operando1 = operando2.contenidoCa2;
+			}else{
+				operando1 = parseInt(operando1);
+			}
+			if(operando2.charAt[2] == 'F'){ 
+				operando2 = operando3.contenidoCa2;
+			}else{
+				operando2 = parseInt(operando2)
+			}
+
+			resultado = operando1*operando2;
+
+			if (resultado < 0) { //aplicar complemento a2 con k=32 bits
+				registros[reg1].contenidoCa2 = resultado;
+
+				resultado = Ca2(resultado+1);
+				registros[reg1].contenido = resultado;
+			} else {
+				resultado = resultado.toString(16); //convirtiendo a hexadecimal
+
+				//preparando resultado
+				let cantidadBytesResult2 = resultado.length;
+				let bytesAdd = (8 - cantidadBytesResult2);
+				let ceros = "";
+				for (let i = 0; i < bytesAdd; i++) {
+					ceros += "0";
+				}
+				console.log("0x" + ceros + resultado);
+				resultado = "0x" + ceros + resultado;
+				console.log(registros[registros[reg1].contenido]);
+				//almacenar el resultado en los registros
+				registros[reg1].contenido = resultado;
+			}
+			generarRegistros();
+			fin = finalizando();
+			mostrarEnMensajesExito(inicio, fin);
+		}
+	}
+}
+
+function mulCon3Registros(registro1, registro2, registro3){
+
+	let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
+	let reg2 = parseInt(borrarElementoCadena(registro2, 'r'));
+	let reg3 = parseInt(borrarElementoCadena(registro3, 'r'));
+
+	if (reg1 >= 8) {
+		imprimirError(errores["registro"][3] + registro1);
+	} else {
+		if (reg2 >= 8) {
+			imprimirError(errores["registro"][3] + registro2);
+		}else{
+			if (reg3 >= 8) {
+				imprimirError(errores["registro"][3] + registro3);
+			}else{
+				if(reg1 != reg2 && reg1 != reg3 && reg2 != reg3){
+					imprimirError(errores["sintaxis"][1]);
+				}else{
+					if(reg1 == reg2 || reg1 == reg3){
+						let operando2 = registros[reg2].contenido;
+						let operando3 = registros[reg3].contenido;
+						let resultado;
+
+						//Verificamos si los registros tienen numeros negativos
+						if(operando2.charAt[2] == 'F'){ 
+							operando2 = operando2.contenidoCa2;
+						}else{
+							operando2 = parseInt(operando2);
+						}
+						if(operando3.charAt[2] == 'F'){ 
+							operando3 = operando3.contenidoCa2;
+						}else{
+							operando3 = parseInt(operando3)
+						}
+
+						resultado = operando2*operando3;
+
+						if (resultado < 0) { //aplicar complemento a2 con k=32 bits
+							registros[reg1].contenidoCa2 = resultado;
+							
+							resultado = Ca2(resultado+1);
+							registros[reg1].contenido = resultado;
+						} else {
+							resultado = resultado.toString(16); //convirtiendo a hexadecimal
+
+							//preparando resultado
+							let cantidadBytesResult2 = resultado.length;
+							let bytesAdd = (8 - cantidadBytesResult2);
+							let ceros = "";
+							for (let i = 0; i < bytesAdd; i++) {
+								ceros += "0";
+							}
+							console.log("0x" + ceros + resultado);
+							resultado = "0x" + ceros + resultado;
+							console.log(registros[registros[reg1].contenido]);
+							//almacenar el resultado en los registros
+							registros[reg1].contenido = resultado;
+						}
+						generarRegistros();
+						fin = finalizando();
+						mostrarEnMensajesExito(inicio, fin);	
+					}else{
+						imprimirError(errores["sintaxis"][1]);
+					}	
+				}	
+			}
+		}
+	}
 }
 /************************************FIN funciones Gerardo*****************************************/
 
@@ -1069,6 +1503,72 @@ function addCon2RegistrosY1DatoInmediato(registro1, registro2, inm) {
 		mostrarEnMensajesExito(inicio, fin);
 	}
 }
+
+//suponiendo que se ha de recibir add [rX, rY, rZ] o add [rX, rX, rY] o add [rX, rY, rY]
+
+function addCon3Registros(registro1, registro2, registro3) {  
+	
+	let reg1 = parseInt(registro1.charAt(1));
+	let reg2 = parseInt(registro2.charAt(1));
+	let reg3 = parseInt(registro3.charAt(1));
+
+
+	let reg1 = parseInt(borrarElementoCadena(registro1, 'r'));
+	let reg2 = parseInt(borrarElementoCadena(registro1, 'r'));
+	let reg3 = parseInt(borrarElementoCadena(registro1, 'r'));
+
+	if (reg1 >= 8) {
+		imprimirError(errores["registro"][3] + registro1);
+	} else {
+		if (reg2 >= 8) {
+			imprimirError(errores["registro"][3] + registro2);
+		} else {
+			if(reg3>=8){
+				imprimirError(errores["registro"][3] + registro2);
+			} else {
+				if(reg1!= reg2 && reg1 != reg3 && reg2 != reg3){
+					imprimirError(errores["sintaxis"][1]);
+				}else{
+
+					let operando2=parseInt(registros[reg2].contenido);
+					let operando3=parseInt(registros[reg3].contenido);
+					let resultado;
+
+					
+					resultado= operando2+operando3; 
+
+					if(resultado<0){//aplicar complemento a2 con k=32 bits
+						resultado= Ca2(resultado);
+						registros[reg].contenido=resultado;
+					}else{
+						resultado=resultado.toString(16); //convirtiendo a hexadecimal
+						
+
+						//preparando el resultado
+						let cantidadBytesResult2=resultado.length;
+						let bytesAdd=(8-cantidadBytesResult2);
+						let ceros=""
+						for(let i=0; i<bytesAdd;i++){
+							ceros+="0"
+						}
+						console.log("0x"+ceros+resultado)
+						resultado="0x"+ceros+resultado
+						console.log(registros[registros[reg].contenido])
+						//almacenar el resultado en los registros
+                		registros[reg].contenido=resultado;
+                    }
+                }
+            }
+        }
+        generarRegistros();
+		fin = finalizando();
+		mostrarEnMensajesExito(inicio, fin);
+
+    }
+
+}
+
+
 
 /*********************************************************Fin Funciones Angel copia***************************************************/
 function iniciando(){
